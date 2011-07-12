@@ -6,12 +6,13 @@
   (:use ring.middleware.session.store)
   (:use ring.util.response)
  (:use ring.middleware.session.cookie)
-  (:use [WCombatPad.core :only (show-login)]))
+  (:use [WCombatPad.core :only (filter-loged show-login show-combat)]))
  (def store (cookie-store))
 (defroutes pad-routes
-  (GET "/login" [] (show-login))
+  (GET "/login" {{redir :redirection :as session} :session} (show-login))
   (GET "/loged" {session :session} (if (session :loged) "HOLA" "ADIOS"))
-  (POST "/login" {session :session {password :password} :params}
-         (assoc (redirect "/loged") :session (assoc session :loged true))))
+  (POST "/login" {{redir :redirection :as session} :session {password :password} :params}
+        (assoc (redirect redir) :session (assoc session :loged true)))
+  (GET "/combat/:combat-name" {{combat-name :combat-name} :params session :session :as args} (filter-loged args show-combat combat-name)))
 
 (def pad-web (wrap-base-url (handler/site pad-routes)))
