@@ -13,3 +13,6 @@
   (if loged (apply fn params)
       (assoc (redirect "/login") :session (assoc session :redirection uri))))
 (defn show-combat [combat-name] combat-name)
+(defn link-to-combat [combat-name] [:a {:href (str "/combat/" combat-name)} combat-name])
+(defn show-list [] 
+  (html5 (unordered-list [(link-to-combat "uno") "dos" "tres"])))
