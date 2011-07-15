@@ -1,0 +1,30 @@
+section {
+   margin-top: 1em; 
+   margin-left: 1em;
+   font-family: sans-serif;
+   border: 2px solid #897048;
+   height: 300px;
+   width:200px;
+}
+
+nav { 
+	float:left
+}
+
+section#mat {
+    width: 70%;
+    height: 780px;
+    float:left;
+}
+img#map {
+position: relative;
+left: 0px;
+top: 0px;
+float:left;
+}
+img.token {
+position: absolute;
+left: 20px;
+top: 20px;
+float:left;
+}

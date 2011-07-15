@@ -9,6 +9,7 @@
   (:use [WCombatPad.core :only (filter-loged show-login show-combat show-list)]))
  (def store (cookie-store))
 (defroutes pad-routes
+  (route/resources "/")
   (GET "/" args (filter-loged args show-list ))
   (GET "/login" {{redir :redirection :as session} :session} (show-login))
   (GET "/loged" {session :session} (if (session :loged) "HOLA" "ADIOS"))
