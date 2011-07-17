@@ -15,16 +15,30 @@ section#mat {
     width: 70%;
     height: 780px;
     float:left;
+    clear:both;
 }
+
+section#tokens {
+float:left;
+width:0;
+}
+
 img#map {
+float:both;
 position: relative;
 left: 0px;
-top: 0px;
-float:left;
 }
 img.token {
-position: absolute;
-left: 20px;
+position: relative;
+left: 120px;
 top: 20px;
+z-index: 10;
 float:left;
+}
+
+div#position {
+position: relative;
+float:left;
+border: 2px solid #ffffff;
+z-index: 10;
 }
