@@ -1,4 +1,5 @@
 (ns WCombatPad.core
+  (:import java.net.URL )
   (:use hiccup.core)
   (:use hiccup.page-helpers)
   (:use hiccup.form-helpers)
@@ -18,7 +19,8 @@
             "/js/jquery-ui-1.8.12.custom.min.js"
             "/js/mat.js")])
 (defn get-combat-data [combat-name]
-  {:mat "http://i669.photobucket.com/albums/vv53/elnopintan/AOW/almacen_hundido_bajo_parcial.jpg"
+  {:name combat-name
+   :mat "almacen_hundido_bajo_parcial"
    :grid-size 20
    :offset [19 10]
    :characters [{:name "cleric"
@@ -33,13 +35,13 @@
                                       (+ offset-y (* y grid-size)) "px; left:"
                                       (+ offset-x (- (* x grid-size) (* grid-size number))) "px;")} ])
 
-(defn show-mat [{mat :mat grid-size :grid-size offset :offset  characters :characters}]
+(defn show-mat [{combat-name :name mat :mat grid-size :grid-size offset :offset  characters :characters}]
   [:section#mat
    (map (partial show-character-position grid-size offset) (iterate inc 0) characters)
    [:div#position {:style (str "width:" (- grid-size 4) "px;"
                                "height:" (- grid-size 4) "px;"
                                ) } ""]
-   [:img#map {:src mat :style (str "left:-" (* grid-size (+ 1(count characters))) "px;") :width "500px"}]
+   [:img#map {:src (str "/combat/" combat-name "/map/" mat) :style (str "left:-" (* grid-size (+ 1(count characters))) "px;") :width "500px"}]
    ])
 (defn show-character [{char-name :name image :avatar}]
   [:div.character [:img {:src image :width "30px" :height "30px" }] char-name])
@@ -49,8 +51,9 @@
                                       
 (defn show-actions [combat-data] [:section#actions
                                   (unordered-list ["move" "move" "move"])])
-(defn get-map [file grid-size offset]
-  (println (slurp file)))
+(defn get-map [map-name grid-size offset]
+  (let [file (URL. (str "http://localhost:3000/images/maps/" map-name ".jpg"))]
+    (.openStream file)))
 
 (defn show-combat [combat-name]
   (let [combat-data (get-combat-data combat-name)]
