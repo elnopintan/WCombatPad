@@ -22,7 +22,7 @@
         (assoc (redirect redir) :session (assoc session :loged true)))
   (GET "/combat/:combat-name" {{combat-name :combat-name} :params session :session :as args}
        (filter-loged args show-combat combat-name))
-  (GET "/combat/:combat-name/map/:map-name" [combat-name map-name] (get-map map-name nil nil))
+  (GET "/combat/:combat-name/map/:map-name" [combat-name map-name] (get-map map-name ))
    )
 
 (def pad-web (wrap-base-url (handler/site pad-routes)))

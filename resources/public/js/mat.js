@@ -1,2 +1,2 @@
 $(function(){
-    $(".token").draggable({grid: [20,20]});});
+    $(".token").draggable({grid: [gridSize,gridSize]});});
