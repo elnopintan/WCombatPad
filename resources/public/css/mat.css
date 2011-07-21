@@ -37,8 +37,9 @@ float:left;
 }
 
 div#position {
-position: relative;
+position: absolute;
 float:left;
+visibility:hidden;
 border: 2px solid #ffffff;
 z-index: 10;
 }
