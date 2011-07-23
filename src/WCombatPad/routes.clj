@@ -7,15 +7,17 @@
   (:use ring.util.response)
  (:use ring.middleware.session.cookie)
  (:use [WCombatPad.core :only (filter-loged
-                               show-login
-                               show-combat
-                               show-list
-                               get-map)]))
- (def store (cookie-store))
+                               show-login)])
+ (:use [WCombatPad.mat :only (show-combat)])
+ (:use [WCombatPad.list :only (show-list)])
+ (:use [WCombatPad.images :only (get-map)]))
+
+
+
+(def store (cookie-store))
 (defroutes pad-routes
-  (route/resources "/")
-  
-  (GET "/combat" args (filter-loged args show-list ))
+  (route/resources "/files")
+  (GET "/" args (filter-loged args show-list ))
   (GET "/login" {{redir :redirection :as session} :session} (show-login))
   (GET "/loged" {session :session} (if (session :loged) "HOLA" "ADIOS"))
   (POST "/login" {{redir :redirection :as session} :session {password :password} :params}
