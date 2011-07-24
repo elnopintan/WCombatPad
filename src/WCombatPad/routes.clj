@@ -8,8 +8,8 @@
  (:use ring.middleware.session.cookie)
  (:use [WCombatPad.core :only (filter-loged
                                show-login)])
- (:use [WCombatPad.mat :only (show-combat)])
- (:use [WCombatPad.list :only (show-list new-combat)])
+ (:use [WCombatPad.mat :only (show-combat save-image)])
+ (:use [WCombatPad.list :only (show-list new-combat delete-combat)])
  (:use [WCombatPad.images :only (get-map)]))
 
 
@@ -25,7 +25,9 @@
   (POST"/combat" {{combat-name :matname} :params} (new-combat combat-name))
   (GET "/combat/:combat-name" {{combat-name :combat-name} :params session :session :as args}
        (filter-loged args show-combat combat-name))
-  (GET "/combat/:combat-name/map/:map-name" [combat-name map-name] (get-map map-name ))
+  (DELETE "/combat/:combat-name" [combat-name] (delete-combat combat-name))
+  (GET "/combat/:combat-name/map" [combat-name ] (get-map combat-name))
+  (POST "/combat/:combat-name/map" {{combat-name :combat-name image :image } :params} (save-image combat-name image))
    )
 
 (def pad-web (wrap-base-url (handler/site pad-routes)))

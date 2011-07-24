@@ -14,8 +14,8 @@
                     (take-while #(< % width) (iterate #(+ grid-size %) offset-x))))))
 
 (defn get-map [map-name ]
-  (let [{grid-size :grid-size [offset-x offset-y] :offset} (get-combat-data map-name)
-        image (ImageIO/read (URL. (str "http://localhost:3000/files/images/maps/" map-name ".jpg")))
+  (let [{grid-size :grid-size [offset-x offset-y] :offset mat :mat} (get-combat-data map-name)
+        image (ImageIO/read (URL. (str "http://localhost:3000/files/images/maps/" mat)))
         output-stream (ByteArrayOutputStream.)
         graphics (.createGraphics image)]
     (do
