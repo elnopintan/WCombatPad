@@ -2,7 +2,7 @@
   (:use hiccup.core)
   (:use hiccup.page-helpers)
   (:use hiccup.form-helpers)
-  (:use [WCombatPad.data :only (get-combat-data set-image-uri)])
+  (:use [WCombatPad.data :only (get-combat-data set-image-uri get-state-list)])
   (:use [ring.util.response :only (redirect)])
   (:require (clojure.contrib [duck-streams :as ds])
   ))
@@ -49,7 +49,7 @@
                                     [
                                      (upload-form pad-name) 
                                      ])])
-(defn- show-state-list [] [:section#states (unordered-list ["a" "b"])])
+(defn show-state-list [combat-name] [:section#states (unordered-list (get-state-list combat-name))])
 (defn show-combat [combat-name]
   (let [combat-data (get-combat-data combat-name)]
     (html5 (get-map-headers combat-data)
@@ -57,7 +57,7 @@
            [:nav
             (show-actions combat-data)
             (show-characters combat-data) 
-            (show-state-list)])))
+            (show-state-list combat-name)])))
 
 (defn save-image [combat-name {img-name :filename stream :tempfile}]
   (let [file-name (str combat-name img-name)]

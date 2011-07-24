@@ -38,9 +38,12 @@
   )
 (defn delete-pad [id] (destroy! :pads (fetch-one :pads :where {:_id id})))
 
-(defn next-state [old-state]
+(defn next-state [description old-state]
   (insert! :combat-status
-           (dissoc (assoc old-state :order (inc (:order old-state))) :_id)))
+           (dissoc (assoc old-state :order (inc (:order old-state))
+                          :description description) :_id)))
  
 (defn set-image-uri [combat-name image-name]
-  (next-state (assoc (get-combat-data combat-name) :mat image-name )))
+  (next-state (str "Nueva imagen " image-name) (assoc (get-combat-data combat-name) :mat image-name )))
+
+(defn get-state-list [combat-name] (map #(:description %) (fetch :combat-status :only [:description] :where {:name combat-name} ))) 
