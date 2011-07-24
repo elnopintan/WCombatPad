@@ -9,7 +9,7 @@
  (:use [WCombatPad.core :only (filter-loged
                                show-login)])
  (:use [WCombatPad.mat :only (show-combat)])
- (:use [WCombatPad.list :only (show-list)])
+ (:use [WCombatPad.list :only (show-list new-combat)])
  (:use [WCombatPad.images :only (get-map)]))
 
 
@@ -22,6 +22,7 @@
   (GET "/loged" {session :session} (if (session :loged) "HOLA" "ADIOS"))
   (POST "/login" {{redir :redirection :as session} :session {password :password} :params}
         (assoc (redirect redir) :session (assoc session :loged true)))
+  (POST"/combat" {{combat-name :matname} :params} (new-combat combat-name))
   (GET "/combat/:combat-name" {{combat-name :combat-name} :params session :session :as args}
        (filter-loged args show-combat combat-name))
   (GET "/combat/:combat-name/map/:map-name" [combat-name map-name] (get-map map-name ))

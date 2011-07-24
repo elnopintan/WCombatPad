@@ -22,7 +22,6 @@
   )
 
 (defn get-pad-list [] (fetch :pads))
-  
 
 (defn create-id [name] (.replaceAll name " " "_"))
 
@@ -31,3 +30,4 @@
    {:_id (create-id name) :name name}
    )
   )
+
