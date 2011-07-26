@@ -2,7 +2,11 @@
   (:use hiccup.core)
   (:use hiccup.page-helpers)
   (:use hiccup.form-helpers)
-  (:use [WCombatPad.data :only (get-combat-data set-image-uri get-state-list)])
+  (:use [WCombatPad.data :only (get-combat-data
+                                set-image-uri
+                                get-state-list
+                                change-grid
+                                )])
   (:use [ring.util.response :only (redirect)])
   (:require (clojure.contrib [duck-streams :as ds])
   ))
@@ -38,17 +42,32 @@
    (unordered-list (map #(show-character %) characters))])
 (defn- multipart-form [form]
   (assoc form 1 (assoc (get form 1) :enctype "multipart/form-data" )))
-(defn- upload-form [pad-name]
+(defn- upload-form [{pad-name :name}]
   [:section#upload_form
    "Nueva imagen"
   (multipart-form (form-to [:post (str "/combat/" pad-name "/map")]
            (file-upload "image")
-           (submit-button "Subir")))])                                      
-(defn- show-actions [{pad-name :name}] [:section#actions
+           (submit-button "Subir")))])
+
+(defn- change-grid-form [{pad-name :name
+                          [posx posy] :offset
+                          grid-size :grid-size}]
+  [:section#change_grid
+   "Modificar rejilla"
+   (form-to [:post (str "/combat/" pad-name "/grid")]
+            (label "posx" "Offset X")
+            (text-field "posx" posx)[:br]
+            (label "posy" "Offset Y")
+            (text-field "posy" posy)[:br]
+            (label "gridsize" "Anchura")
+            (text-field "gridsize" grid-size)[:br]
+            (submit-button "Modificar"))])
+
+(defn- show-actions [combat-data] [:section#actions
                                    (unordered-list
-                                    [
-                                     (upload-form pad-name) 
-                                     ])])
+                                    (map #(% combat-data)
+                                     [ upload-form
+                                     change-grid-form] ))])
 (defn show-state-list [combat-name] [:section#states (unordered-list (get-state-list combat-name))])
 (defn show-combat [combat-name]
   (let [combat-data (get-combat-data combat-name)]
@@ -66,3 +85,7 @@
     (set-image-uri combat-name file-name)
     (redirect (str "/combat/" combat-name))
       )))
+
+(defn save-grid [combat-name posx posy grid-size]
+  (do (change-grid combat-name posx posy grid-size)
+      (redirect (str "/combat/" combat-name))))

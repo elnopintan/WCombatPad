@@ -1,10 +1,24 @@
+body {
+font-size: 0.8em;
+}
+
+form > input {
+font-size: 0.8em;
+}
+section#change_grid > form > input {
+width: 5em;
+}
+
+section#mat {
+ height: 300px;
+   width:200px;
+}
+
 section#actions, section#state-list, section#characters,section#mat {
    margin-top: 1em; 
    margin-left: 1em;
    font-family: sans-serif;
-   border: 2px solid #897048;
-   height: 300px;
-   width:200px;
+   
 }
 
 nav { 

@@ -38,12 +38,22 @@
   )
 (defn delete-pad [id] (destroy! :pads (fetch-one :pads :where {:_id id})))
 
-(defn next-state [description old-state]
-  (insert! :combat-status
-           (dissoc (assoc old-state :order (inc (:order old-state))
-                          :description description) :_id)))
+(defn next-state [combat-name description type & changes]
+  (let [last-state (get-combat-data combat-name)
+        next-state (apply assoc last-state changes)]
+  (if (= (:type last-state) type)
+    (update!
+     :combat-status  last-state (assoc next-state :description description))
+    (insert!
+     :combat-status
+           (dissoc (assoc next-state :order (inc (:order next-state))
+                          :description description :type type) :_id)))))
  
 (defn set-image-uri [combat-name image-name]
-  (next-state (str "Nueva imagen " image-name) (assoc (get-combat-data combat-name) :mat image-name )))
+  (next-state  combat-name (str "Nuevo mapa " image-name) "MapImage" :mat image-name ))
+
+(defn change-grid [combat-name posx posy size]
+  (next-state combat-name (str "Cambio de rejilla ["posx " " posy "] " size)
+              "Grid" :offset [posx posy] :grid-size size))
 
 (defn get-state-list [combat-name] (map #(:description %) (fetch :combat-status :only [:description] :where {:name combat-name} ))) 
