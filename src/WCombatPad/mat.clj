@@ -6,6 +6,7 @@
                                 set-image-uri
                                 get-state-list
                                 change-grid
+                                set-new-character
                                 )])
   (:use [ring.util.response :only (redirect)])
   (:require (clojure.contrib [duck-streams :as ds])
@@ -63,11 +64,24 @@
             (text-field "gridsize" grid-size)[:br]
             (submit-button "Modificar"))])
 
+(defn- create-character [{pad-name :name}]
+  [:section#create_character
+   "Crear personaje"
+   (multipart-form (form-to
+                    [:post (str "/combat/" pad-name "/character")]
+                    (label "charname" "Nombre")
+                    (text-field "charname")[:br]
+                    (label "avatar" "Avatar")
+                    (file-upload "avatar")[:br]
+                    (submit-button "Crear")
+                    ))])
+            
 (defn- show-actions [combat-data] [:section#actions
                                    (unordered-list
                                     (map #(% combat-data)
                                      [ upload-form
-                                     change-grid-form] ))])
+                                      change-grid-form
+                                      create-character] ))])
 (defn show-state-list [combat-name] [:section#states (unordered-list (get-state-list combat-name))])
 (defn show-combat [combat-name]
   (let [combat-data (get-combat-data combat-name)]
@@ -78,13 +92,26 @@
             (show-characters combat-data) 
             (show-state-list combat-name)])))
 
+(defn save-file [file-name dir stream]
+  (ds/copy stream (ds/file-str (str "resources/public/images/" dir "/" file-name)))
+  )
+
 (defn save-image [combat-name {img-name :filename stream :tempfile}]
   (let [file-name (str combat-name img-name)]
   (do
-    (ds/copy stream (ds/file-str (str "resources/public/images/maps/" combat-name img-name)))
+    (save-file file-name "maps" stream)  
     (set-image-uri combat-name file-name)
     (redirect (str "/combat/" combat-name))
-      )))
+    )))
+
+(defn save-character [combat-name character-name {img-name :filename stream :tempfile}]
+  (let [file-name (str combat-name character-name img-name)]
+    (do
+      (save-file file-name "chars" stream)
+      (set-new-character combat-name character-name file-name)
+      (redirect (str "/combat/" combat-name)))))
+      
+
 
 (defn save-grid [combat-name posx posy grid-size]
   (do (change-grid combat-name posx posy grid-size)

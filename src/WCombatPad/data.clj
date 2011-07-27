@@ -40,7 +40,10 @@
 
 (defn next-state [combat-name description type & changes]
   (let [last-state (get-combat-data combat-name)
-        next-state (apply assoc last-state changes)]
+        map-changes (apply assoc {} changes)
+        chars (conj (:characters last-state) (:character map-changes))
+        changes-with-chars (assoc (dissoc map-changes :character) :characters chars)
+        next-state (merge last-state changes-with-chars)]
   (if (= (:type last-state) type)
     (update!
      :combat-status  last-state (assoc next-state :description description))
@@ -55,5 +58,9 @@
 (defn change-grid [combat-name posx posy size]
   (next-state combat-name (str "Cambio de rejilla ["posx " " posy "] " size)
               "Grid" :offset [posx posy] :grid-size size))
+
+(defn set-new-character [combat-name character-name avatar]
+  (next-state combat-name (str "Nuevo Personaje "character-name) "NewCharacter" :character {:name character-name :avatar (str "/files/images/chars/" avatar) :pos [0 0] }
+  ))
 
 (defn get-state-list [combat-name] (map #(:description %) (fetch :combat-status :only [:description] :where {:name combat-name} ))) 
