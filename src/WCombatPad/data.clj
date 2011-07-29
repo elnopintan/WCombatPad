@@ -41,8 +41,17 @@
 (defn next-state [combat-name description type & changes]
   (let [last-state (get-combat-data combat-name)
         map-changes (apply assoc {} changes)
-        chars (conj (:characters last-state) (:character map-changes))
-        changes-with-chars (assoc (dissoc map-changes :character) :characters chars)
+        chars (if (:character map-changes)
+                (conj (:characters last-state) (:character map-changes))
+                (:characters last-state))
+        movement (map-changes :move)
+        moved-chars (if movement
+                      (map #(if (= (:name %) (:name movement))
+                              (assoc % :pos (:pos movement))
+                              %)
+                           chars)
+                      chars)      
+        changes-with-chars (assoc (dissoc map-changes :character :move) :characters moved-chars)
         next-state (merge last-state changes-with-chars)]
   (if (= (:type last-state) type)
     (update!
@@ -61,6 +70,12 @@
 
 (defn set-new-character [combat-name character-name avatar]
   (next-state combat-name (str "Nuevo Personaje "character-name) "NewCharacter" :character {:name character-name :avatar (str "/files/images/chars/" avatar) :pos [0 0] }
-  ))
+              ))
+
+(defn move-character [combat-name character-name pos]
+  (next-state combat-name
+              (str character-name " movido")
+              (str "Move"character-name)
+              :move {:name character-name :pos pos}))
 
 (defn get-state-list [combat-name] (map #(:description %) (fetch :combat-status :only [:description] :where {:name combat-name} ))) 
