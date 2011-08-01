@@ -7,6 +7,7 @@
                                 get-state-list
                                 change-grid
                                 set-new-character
+                                move-character
                                 )])
   (:use [ring.util.response :only (redirect)])
   (:require (clojure.contrib [duck-streams :as ds])
@@ -83,14 +84,18 @@
                                       change-grid-form
                                       create-character] ))])
 (defn show-state-list [combat-name] [:section#states (unordered-list (get-state-list combat-name))])
-(defn show-combat [combat-name]
-  (let [combat-data (get-combat-data combat-name)]
-    (html5 (get-map-headers combat-data)
-           (show-mat combat-data) 
+(defn show-body [{ combat-name :name :as combat-data }]
+  [:body (show-mat combat-data) 
            [:nav
             (show-actions combat-data)
             (show-characters combat-data) 
-            (show-state-list combat-name)])))
+            (show-state-list combat-name)]])
+
+(defn show-combat [combat-name]
+  (let [combat-data (get-combat-data combat-name)]
+     (html5 (get-map-headers combat-data)
+           (show-body combat-data)
+          )))
 
 (defn save-file [file-name dir stream]
   (ds/copy stream (ds/file-str (str "resources/public/images/" dir "/" file-name)))
@@ -117,3 +122,6 @@
   (do (change-grid combat-name posx posy grid-size)
       (redirect (str "/combat/" combat-name))))
 
+(defn save-move [combat-name char-name posx posy]
+  (do (move-character combat-name char-name [posx posy])
+      (html (show-body (get-combat-data combat-name)))))

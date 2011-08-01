@@ -1,4 +1,4 @@
-$(function(){
+function setupMat() {
     $(document).mousemove(function(e){
         var aMap=$("#map");
 	$("#position").css("visibility",false);
@@ -11,7 +11,11 @@ $(function(){
 			      posX=(posX-posX%gridSize)/gridSize;
 			      var posY=$(this).offset().top-aMap.offset().top;
 			      posY=(posY-posY%gridSize)/gridSize;
+			      var name=$(this).attr("id");
 			      $.post("/combat/"+combatName+"/move",
-				     {name: "Celeste", posx: posX, posy: posY});
+				     {name: name, posx: posX, posy: posY},
+				     function (data) { $("body").html(data);
+						       setupMat();})
 }})}
-)
+
+$(setupMat)

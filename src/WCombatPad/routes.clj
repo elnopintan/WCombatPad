@@ -8,7 +8,8 @@
  (:use ring.middleware.session.cookie)
  (:use [WCombatPad.core :only (filter-loged
                                show-login)])
- (:use [WCombatPad.mat :only (show-combat save-image save-grid save-character)])
+ (:use [WCombatPad.mat :only (show-combat save-image save-grid save-character
+                                          save-move )])
  (:use [WCombatPad.list :only (show-list new-combat delete-combat)])
  (:use [WCombatPad.images :only (get-map)]))
 
@@ -40,6 +41,12 @@
   (POST "/combat/:combat-name/character"
         {{combat-name :combat-name char-name :charname image :avatar } :params :as args}
         (filter-loged args save-character combat-name char-name image))
+  
+  (POST "/combat/:combat-name/move"
+        {{combat-name :combat-name char-name :name str-posx :posx str-posy :posy } :params :as args}
+        (let [ posx (Integer. str-posx)
+               posy (Integer. str-posy)]
+        (filter-loged args save-move combat-name char-name posx posy)))
   (POST "/combat/:combat-name/grid"
         {{combat-name :combat-name str-posx :posx str-posy :posy str-grid-size :gridsize} :params :as args}
         (let [ posx (Integer. str-posx)
