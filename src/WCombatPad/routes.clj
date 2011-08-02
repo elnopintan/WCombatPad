@@ -29,12 +29,17 @@
   (GET "/combat/:combat-name"
        {{combat-name :combat-name} :params session :session :as args}
        (filter-loged args show-combat combat-name))
+  (GET "/combat/:combat-name/state/:order"
+       {{combat-name :combat-name str-order :order} :params :as args}
+       (let [order (Integer. str-order)]
+         (filter-loged args show-combat combat-name order)))
   (DELETE "/combat/:combat-name"
           {{combat-name :combat-name} :params :as args}
           (filter-loged args delete-combat combat-name))
-  (GET "/combat/:combat-name/map"
-       {{combat-name :combat-name} :params :as args}
-       (get-map combat-name))
+  (GET "/combat/:combat-name/map/:order"
+       {{combat-name :combat-name str-order :order} :params :as args}
+       (let [order (Integer. str-order)]
+       (get-map combat-name order)))
   (POST "/combat/:combat-name/map"
         {{combat-name :combat-name image :image } :params :as args}
         (filter-loged args save-image combat-name image))

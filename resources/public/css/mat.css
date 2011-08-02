@@ -10,8 +10,8 @@ width: 5em;
 }
 
 section#mat {
- height: 300px;
-   width:200px;
+# height: 300px;
+#   width:200px;
 }
 
 section#actions, section#state-list, section#characters,section#mat {
@@ -22,12 +22,12 @@ section#actions, section#state-list, section#characters,section#mat {
 }
 
 nav { 
-	float:left
+	float:right;
 }
 
 section#mat {
-    width: 70%;
-    height: 780px;
+ #   width: 70%;
+ #   height: 780px;
     float:left;
     clear:both;
 }

@@ -17,14 +17,17 @@
                  :pos [8 7]}]})
 
 (defn get-combat-data
-  [combat-name]                                     ;  ejemplo
+  ([combat-name]                                     ;  ejemplo
   (let [
-        number (fetch-count :combat-status :where {:name combat-name}) 
-        last-combat (fetch-one :combat-status :where {:name combat-name :order (dec number)} )]
-    (if last-combat
-      last-combat
+        number (fetch-count :combat-status :where {:name combat-name}) ]
+    (if (> number 0)
+      (get-combat-data combat-name (dec number))
       {:name combat-name  :offset [0 0] :grid-size 10 :order -1}
       )))
+  ([combat-name order]
+  (fetch-one :combat-status :where {:name combat-name :order order })
+  ))
+
 
 (defn get-pad-list [] (fetch :pads))
   
@@ -78,4 +81,4 @@
               (str "Move"character-name)
               :move {:name character-name :pos pos}))
 
-(defn get-state-list [combat-name] (map #(:description %) (fetch :combat-status :only [:description] :where {:name combat-name} ))) 
+(defn get-state-list [combat-name]  (fetch :combat-status :only [:order :description] :where {:name combat-name} )) 

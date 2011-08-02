@@ -13,12 +13,15 @@
   (:require (clojure.contrib [duck-streams :as ds])
   ))
 
-(defn- get-map-headers [{ mat-name :name grid-size :grid-size [offset-x offset-y] :offset }] [:head (include-css "/files/css/mat.css")
-          [:script {:type "text/javascript"} (str "gridSize=" grid-size"; offsetX=" offset-x "; offsetY=" offset-y"; combatName='" mat-name "';" )]
+(defn- get-map-headers [{ mat-name :name grid-size :grid-size [offset-x offset-y] :offset } script]
+  [:head
+   (include-css "/files/css/mat.css")
+   (if script
+     [:script {:type "text/javascript"} (str "gridSize=" grid-size"; offsetX=" offset-x "; offsetY=" offset-y"; combatName='" mat-name "';" )]
           (include-js 
             "/files/js/jquery-1.6.1.min.js" 
             "/files/js/jquery-ui-1.8.12.custom.min.js"
-            "/files/js/mat.js")])
+            "/files/js/mat.js"))])
 
 
 (defn- show-character-position [ grid-size [offset-x offset-y]  number {image :avatar  [x y] :pos char-name :name}]
@@ -27,13 +30,13 @@
                                       (+ offset-y (* y grid-size)) "px; left:"
                                       (+ offset-x (- (* x grid-size) (* grid-size number))) "px;")} ])
 
-(defn- show-mat [{combat-name :name mat :mat grid-size :grid-size offset :offset  characters :characters}]
+(defn- show-mat [{combat-name :name mat :mat grid-size :grid-size offset :offset  characters :characters order :order}]
   [:section#mat
    (map (partial show-character-position grid-size offset) (iterate inc 0) characters)
    [:div#position {:style (str "width:" (- grid-size 4) "px;"
                                "height:" (- grid-size 4) "px;"
                                ) } ""]
-   [:img#map {:src (str "/combat/" combat-name "/map") :style (str "left:-" (* grid-size (count characters)) "px;") }]
+   [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left:-" (* grid-size (count characters)) "px;") }]
    ])
 
 (defn- show-character [{char-name :name image :avatar}]
@@ -83,7 +86,14 @@
                                      [ upload-form
                                       change-grid-form
                                       create-character] ))])
-(defn show-state-list [combat-name] [:section#states (unordered-list (get-state-list combat-name))])
+(defn show-state [combat-name {order :order description :description}]
+  [:a { :href (str "/combat/" combat-name "/state/" order)} description])
+
+(defn show-state-list [combat-name]
+  [:section#states (unordered-list
+                    (map #(show-state combat-name %)
+                         (get-state-list combat-name)))])
+
 (defn show-body [{ combat-name :name :as combat-data }]
   [:body (show-mat combat-data) 
            [:nav
@@ -91,11 +101,22 @@
             (show-characters combat-data) 
             (show-state-list combat-name)]])
 
-(defn show-combat [combat-name]
-  (let [combat-data (get-combat-data combat-name)]
-     (html5 (get-map-headers combat-data)
+(defn
+  show-combat
+  ([combat-name]
+     (let [combat-data (get-combat-data combat-name)]
+     (html5 (get-map-headers combat-data true)
            (show-body combat-data)
-          )))
+           )))
+  ([combat-name order]
+     (let [combat-data (get-combat-data combat-name order)]
+       (html5
+        (get-map-headers combat-data false)
+        (show-mat combat-data)
+        [:nav
+         (show-state-list combat-name)
+         [:a {:href (str "/combat/" combat-name) } "Volver"]]))))
+  
 
 (defn save-file [file-name dir stream]
   (ds/copy stream (ds/file-str (str "resources/public/images/" dir "/" file-name)))
@@ -125,3 +146,4 @@
 (defn save-move [combat-name char-name posx posy]
   (do (move-character combat-name char-name [posx posy])
       (html (show-body (get-combat-data combat-name)))))
+
