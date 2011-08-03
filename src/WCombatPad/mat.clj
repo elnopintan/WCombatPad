@@ -14,19 +14,20 @@
   ))
 
 (defn- get-map-headers [{ mat-name :name grid-size :grid-size [offset-x offset-y] :offset } script]
-  [:head
-   (include-css "/files/css/mat.css")
+  (vec (concat
+        [:head
+   (include-css "/files/css/mat.css")]
    (if script
-     [:script {:type "text/javascript"} (str "gridSize=" grid-size"; offsetX=" offset-x "; offsetY=" offset-y"; combatName='" mat-name "';" )]
+     [[:script {:type "text/javascript"} (str "gridSize=" grid-size"; offsetX=" offset-x "; offsetY=" offset-y"; combatName='" mat-name "';" )]
           (include-js 
             "/files/js/jquery-1.6.1.min.js" 
             "/files/js/jquery-ui-1.8.12.custom.min.js"
-            "/files/js/mat.js"))])
+            "/files/js/mat.js")]))))
 
 
 (defn- show-character-position [ grid-size [offset-x offset-y]  number {image :avatar  [x y] :pos char-name :name}]
   [:img.token {:id char-name :src image :style (str "z-index: 10; width:"
-                                      grid-size "px; top:"
+                                      grid-size "px; height:" grid-size "px; top:"
                                       (+ offset-y (* y grid-size)) "px; left:"
                                       (+ offset-x (- (* x grid-size) (* grid-size number))) "px;")} ])
 
@@ -87,7 +88,10 @@
                                       change-grid-form
                                       create-character] ))])
 (defn show-state [combat-name {order :order description :description}]
-  [:a { :href (str "/combat/" combat-name "/state/" order)} description])
+  [:div
+   [:a { :href (str "/combat/" combat-name "/state/" order)} description]
+   " "
+   [:a { :href (str "/combat/" combat-name "/state/" order ".png")} " IMG"]])
 
 (defn show-state-list [combat-name]
   [:section#states (unordered-list

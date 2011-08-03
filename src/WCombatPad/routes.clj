@@ -11,7 +11,7 @@
  (:use [WCombatPad.mat :only (show-combat save-image save-grid save-character
                                           save-move )])
  (:use [WCombatPad.list :only (show-list new-combat delete-combat)])
- (:use [WCombatPad.images :only (get-map)]))
+ (:use [WCombatPad.images :only (get-map get-image-state )]))
 
 
 
@@ -40,6 +40,10 @@
        {{combat-name :combat-name str-order :order} :params :as args}
        (let [order (Integer. str-order)]
        (get-map combat-name order)))
+  (GET "/combat/:combat-name/state/:order.png"
+       {{combat-name :combat-name str-order :order} :params :as args}
+       (let [order (Integer. str-order)]
+       (get-image-state combat-name order)))
   (POST "/combat/:combat-name/map"
         {{combat-name :combat-name image :image } :params :as args}
         (filter-loged args save-image combat-name image))
