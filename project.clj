@@ -5,6 +5,7 @@
                  [midje "1.1"]
 		[compojure "0.6.2"]
 		[hiccup "0.3.4"]
+                [net.java.dev.jets3t/jets3t "0.7.1"]
     [congomongo "0.1.5-SNAPSHOT"]]
   :dev-dependencies [[lein-eclipse "1.0.0"]
                      [lein-ring "0.4.0"]]
