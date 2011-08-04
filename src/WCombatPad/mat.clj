@@ -13,15 +13,16 @@
   (:require (clojure.contrib [duck-streams :as ds])
   ))
 
-(defn- get-map-headers [{ mat-name :name grid-size :grid-size [offset-x offset-y] :offset } script]
-  [:head
-   (include-css "/files/css/mat.css")
-   (if script
+(defn get-map-headers [{ mat-name :name grid-size :grid-size [offset-x offset-y] :offset } script]
+  (vec (concat
+   [:head
+   (include-css "/files/css/mat.css")]
+   (if script [
      [:script {:type "text/javascript"} (str "gridSize=" grid-size"; offsetX=" offset-x "; offsetY=" offset-y"; combatName='" mat-name "';" )]
           (include-js 
             "/files/js/jquery-1.6.1.min.js" 
             "/files/js/jquery-ui-1.8.12.custom.min.js"
-            "/files/js/mat.js"))])
+            "/files/js/mat.js")]))))
 
 
 (defn- show-character-position [ grid-size [offset-x offset-y]  number {image :avatar  [x y] :pos char-name :name}]
