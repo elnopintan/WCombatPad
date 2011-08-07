@@ -4,7 +4,28 @@
   (:import java.io.ByteArrayOutputStream)
   (:import java.io.ByteArrayInputStream)
   (:import java.awt.Color)
+  (:import org.jets3t.service.security.AWSCredentials)
+  (:import org.jets3t.service.impl.rest.httpclient.RestS3Service)
+  (:import org.jets3t.service.model.S3Object)
   (:use [WCombatPad.data :only (get-combat-data)]))
+
+(defn s3-service []
+  (let [accesskey (System/getenv "S3ACCESSKEY")
+        secretkey (System/getenv "S3SECRETKEY")]
+        (RestS3Service.
+                 (AWSCredentials. accesskey secretkey))))
+
+(defn save-image-file [file-name dir file]
+  (let [service (s3-service)
+        object  (S3Object. file)]
+    (do (.setKey object file-name)
+    (.putObject service (str "WCombatPad/" dir) object))))
+        
+(defn load-image-file [dir file-name]
+  (let [service (s3-service)
+        bucket (.getBucket service "WCombatPad")]
+    (.getDataInputStream
+     (.getObject service bucket (str dir "/" file-name)))))
 
 (defn paint-grid [graphics image {[offset-x offset-y] :offset  grid-size :grid-size} ]
   (let [width (.getWidth image)
@@ -32,7 +53,7 @@
 
 (defn run-on-image [map-name order & funcs]
  (let [ {mat :mat :as mat-data} (get-combat-data map-name order)
-        image (ImageIO/read (URL. (str "http://localhost:3000/files/images/maps/" mat)))
+        image (ImageIO/read (load-image-file "maps" mat))
         output-stream (ByteArrayOutputStream.)
         graphics (.createGraphics image)]
     (do
@@ -45,3 +66,6 @@
 
 (defn get-image-state [map-name order]
   (run-on-image map-name order paint-grid paint-characters))
+
+
+

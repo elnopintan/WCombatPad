@@ -9,6 +9,7 @@
                                 set-new-character
                                 move-character
                                 )])
+  (:use [WCombatPad.images :only (save-image-file)])
   (:use [ring.util.response :only (redirect)])
   (:require (clojure.contrib [duck-streams :as ds])
   ))
@@ -123,7 +124,8 @@
   
 
 (defn save-file [file-name dir stream]
-  (ds/copy stream (ds/file-str (str "resources/public/images/" dir "/" file-name)))
+  (save-image-file file-name dir stream)
+ ; (ds/copy stream (ds/file-str (str "resources/public/images/" dir "/" file-name)))
   )
 
 (defn save-image [combat-name {img-name :filename stream :tempfile}]

@@ -1,7 +1,7 @@
 (ns WCombatPad.data
   (:use somnium.congomongo))
 
-(mongo! :db "wcombatpad")
+(mongo! :db (System/getenv "MONGOLAB_URI" ))
 
 
 (def ejemplo
@@ -72,7 +72,7 @@
               "Grid" :offset [posx posy] :grid-size size))
 
 (defn set-new-character [combat-name character-name avatar]
-  (next-state combat-name (str "Nuevo Personaje "character-name) "NewCharacter" :character {:name character-name :avatar (str "/files/images/chars/" avatar) :pos [0 0] }
+  (next-state combat-name (str "Nuevo Personaje "character-name) "NewCharacter" :character {:name character-name :avatar (str "/remote/images/chars/" avatar) :pos [0 0] }
               ))
 
 (defn move-character [combat-name character-name pos]
