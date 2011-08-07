@@ -22,7 +22,7 @@
   (GET "/login" {{redir :redirection :as session} :session} (show-login))
   (GET "/loged" {session :session} (if (session :loged) "HOLA" "ADIOS"))
   (POST "/login" {{redir :redirection :as session} :session {password :password} :params}
-        (assoc (redirect redir) :session (assoc session :loged true)))
+        (if (= password (System/getenv "WCOMBATPADPASS")) (assoc (redirect redir) :session (assoc session :loged true)) (redirect "/login")))
   (POST "/combat"
         {{combat-name :matname} :params :as args}
         (filter-loged args new-combat combat-name))
