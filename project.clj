@@ -2,6 +2,7 @@
   :description "FIXME: write description"
   :dependencies [[org.clojure/clojure "1.2.1"]
                  [org.clojure/clojure-contrib "1.2.0"]
+                 [ring/ring-jetty-adapter "0.3.9"]
                  [midje "1.1"]
 		[compojure "0.6.2"]
 		[hiccup "0.3.4"]
