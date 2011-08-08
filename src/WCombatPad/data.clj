@@ -7,7 +7,7 @@
   (if (= (System/getenv "PADMODE") "local")
     (mongo! :db mongo-uri )
     (let [[ _ user password host db port] (re-matches  #"mongodb://([^:]*):([^@]*)@([^:]*):([^/]*)/([^ ]*)" mongo-uri)
-          conn (make-connection :db db :host host :port port)]
+          conn (make-connection db :host host :port port)]
        (do (set-connection! conn)
           (authenticate conn user password)))))
   
