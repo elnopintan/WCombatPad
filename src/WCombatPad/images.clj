@@ -54,7 +54,7 @@
 (defn paint-characters [graphics image {characters :characters grid-size :grid-size [offset-x offset-y] :offset }]
   (do (print characters) (doall (map
           (fn [{avatar :avatar [off-char-x off-char-y] :pos}]
-            (let [char-image (ImageIO/read (URL. (str "http://localhost:3000" avatar )))
+            (let [char-image (ImageIO/read (URL.  avatar ))
                   pos-x (+ (* off-char-x grid-size) offset-x 1)
                   pos-y (+ (* off-char-y grid-size) offset-y 1)]
               (do
