@@ -5,6 +5,7 @@
   (:require [compojure.route :as route])
   (:use ring.middleware.session.store)
   (:use ring.util.response)
+  (:use ring.adapter.jetty)
  (:use ring.middleware.session.cookie)
  (:use [WCombatPad.core :only (filter-loged
                                show-login)])
@@ -68,4 +69,9 @@
 
    )
 
+
 (def pad-web (wrap-base-url (handler/site pad-routes)))
+
+(defn -main []
+  (let [port (Integer/parseInt (System/getenv "PORT"))]
+    (run-jetty pad-web {:port port})))
