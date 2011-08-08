@@ -7,6 +7,7 @@
   (:import org.jets3t.service.security.AWSCredentials)
   (:import org.jets3t.service.impl.rest.httpclient.RestS3Service)
   (:import org.jets3t.service.model.S3Object)
+  (:require (clojure.contrib [duck-streams :as ds]))
   (:use [WCombatPad.data :only (get-combat-data)]))
 
 (defn s3-service []
@@ -15,17 +16,31 @@
         (RestS3Service.
                  (AWSCredentials. accesskey secretkey))))
 
-(defn save-image-file [file-name dir file]
+(defn save-image-file-remote [file-name dir file]
   (let [service (s3-service)
         object  (S3Object. file)]
     (do (.setKey object file-name)
     (.putObject service (str "WCombatPad/" dir) object))))
-        
-(defn load-image-file [dir file-name]
+
+(defn save-image-file-local [file-name dir file]
+  (ds/copy file (ds/file-str (str "resources/public/images/" dir "/" file-name))))
+
+(defn load-image-file-local [dir file-name]
+  (URL. (str "http://localhost:3000/files/images/" dir "/" file-name)))
+
+(defn load-image-file-remote [dir file-name]
   (let [service (s3-service)
         bucket (.getBucket service "WCombatPad")]
     (.getDataInputStream
      (.getObject service bucket (str dir "/" file-name)))))
+
+(if (= "remote" (System/getenv "PADMODE"))
+  (do
+    (def save-image-file save-image-file-remote)
+    (def load-image-file load-image-file-remote))
+  (do
+    (def save-image-file save-image-file-local)
+    (def load-image-file load-image-file-local)))
 
 (defn paint-grid [graphics image {[offset-x offset-y] :offset  grid-size :grid-size} ]
   (let [width (.getWidth image)
