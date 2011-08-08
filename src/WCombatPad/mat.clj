@@ -42,7 +42,7 @@
    ])
 
 (defn- show-character [{char-name :name image :avatar}]
-  [:div.character [:img {:src image :width "30px" :height "30px" }] char-name])
+  [:div.character [:img {:src (str "/remote/images/chars/" image) :width "30px" :height "30px" }] char-name])
 
 (defn- show-characters [{characters :characters}]
   [:section#characters
