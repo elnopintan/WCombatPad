@@ -27,7 +27,7 @@
 
 
 (defn- show-character-position [ grid-size [offset-x offset-y]  number {image :avatar  [x y] :pos char-name :name}]
-  [:img.token {:id char-name :src image :style (str "z-index: 10; width:"
+  [:img.token {:id char-name :src (str "/remote/images/chars/" image) :style (str "z-index: 10; width:"
                                       grid-size "px; height:" grid-size "px; top:"
                                       (+ offset-y (* y grid-size)) "px; left:"
                                       (+ offset-x (- (* x grid-size) (* grid-size number))) "px;")} ])
