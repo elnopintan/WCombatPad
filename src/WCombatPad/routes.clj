@@ -51,8 +51,8 @@
         {{combat-name :combat-name image :image } :params :as args}
         (filter-loged args save-image combat-name image))
   (POST "/combat/:combat-name/character"
-        {{combat-name :combat-name char-name :charname image :avatar } :params :as args}
-        (filter-loged args save-character combat-name char-name image))
+        {{combat-name :combat-name char-name :charname image :avatar copy :copy } :params :as args}
+        (filter-loged args save-character combat-name char-name image copy))
   
   (POST "/combat/:combat-name/move"
         {{combat-name :combat-name char-name :name str-posx :posx str-posy :posy } :params :as args}

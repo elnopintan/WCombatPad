@@ -41,12 +41,32 @@
    [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left:-" (* grid-size (count characters)) "px;") }]
    ])
 
-(defn- show-character [{char-name :name image :avatar}]
-  [:div.character [:img {:src (str "/remote/images/chars/" image) :width "30px" :height "30px" }] char-name])
 
-(defn- show-characters [{characters :characters}]
+  
+(defn- copy-avatar-form [pad-name copy-name image]
+
+  [:section.copy_form
+   "Copiar Avatar"
+   (form-to [:post (str "/combat/" pad-name "/character")]
+            (label "charname" "Nombre")
+            (text-field "charname" copy-name)
+            (submit-button "Copiar")
+            (hidden-field "avatar" image) 
+            (hidden-field "copy" "yes"))])
+
+(defn generate-copy-name [char-name characters]
+  (let [char-names (set (map :name characters))]
+    (first (filter #(not (char-names %)) (map #(str char-name %)(iterate inc 1))))))
+(defn- show-character [{char-name :name image :avatar} pad-name characters]
+  [:div.character
+   [:img {:src (str "/remote/images/chars/" image) :width "30px" :height "30px" }]
+   char-name
+   (unordered-list [(copy-avatar-form pad-name (generate-copy-name char-name characters) image)])
+   ])
+
+(defn- show-characters [{characters :characters pad-name :name }]
   [:section#characters
-   (unordered-list (map #(show-character %) characters))])
+   (unordered-list (map #(show-character % pad-name characters) characters))])
 (defn- multipart-form [form]
   (assoc form 1 (assoc (get form 1) :enctype "multipart/form-data" )))
 (defn- upload-form [{pad-name :name}]
@@ -136,10 +156,14 @@
     (redirect (str "/combat/" combat-name))
     )))
 
-(defn save-character [combat-name character-name {img-name :filename stream :tempfile}]
-  (let [file-name (str combat-name character-name img-name)]
+(defn save-character-file [ file-name { stream :tempfile}]
+  (save-file file-name "chars" stream))
+
+(defn save-character [combat-name character-name image copy]
+  (let [file-name (if copy image (str combat-name character-name (:filename image)))]
     (do
-      (save-file file-name "chars" stream)
+      (if (not copy)
+      (save-character-file file-name image))
       (set-new-character combat-name character-name file-name)
       (redirect (str "/combat/" combat-name)))))
       

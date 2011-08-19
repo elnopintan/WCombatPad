@@ -26,7 +26,7 @@
   (ds/copy file (ds/file-str (str "resources/public/images/" dir "/" file-name))))
 
 (defn load-image-file-local [dir file-name]
-  (URL. (str "http://localhost:3000/files/images/" dir "/" file-name)))
+  (.openStream (URL. (str "http://localhost:3000/files/images/" dir "/" file-name))))
 
 (defn load-image-file-remote [dir file-name]
   (let [service (s3-service)
