@@ -58,29 +58,32 @@
   (let [char-names (set (map :name characters))]
     (first (filter #(not (char-names %)) (map #(str char-name %)(iterate inc 1))))))
 (defn- show-character [{char-name :name image :avatar} pad-name characters]
-  [:div.character
+  [(accordion-header [:div.character-name
    [:img {:src (str "/remote/images/chars/" image) :width "30px" :height "30px" }]
-   char-name
+   char-name ])
+   [:div.character
    (unordered-list [(copy-avatar-form pad-name (generate-copy-name char-name characters) image)])
-   ])
+   ]])
 
 (defn- show-characters [{characters :characters pad-name :name }]
-  [:section#characters
-   (unordered-list (map #(show-character % pad-name characters) characters))])
+  (vec (concat [:section#characters {:class "accordion"}]
+   (reduce concat [] (map #(show-character % pad-name characters) characters)))))
 (defn- multipart-form [form]
   (assoc form 1 (assoc (get form 1) :enctype "multipart/form-data" )))
+(defn accordion-header [data]
+  [:a {:href "#" } [:div data]])
 (defn- upload-form [{pad-name :name}]
+  [(accordion-header "Nueva imagen")
   [:section#upload_form
-   "Nueva imagen"
   (multipart-form (form-to [:post (str "/combat/" pad-name "/map")]
            (file-upload "image")
-           (submit-button "Subir")))])
+           (submit-button "Subir")))]])
 
 (defn- change-grid-form [{pad-name :name
                           [posx posy] :offset
                           grid-size :grid-size}]
+  [(accordion-header "Modificar rejilla")
   [:section#change_grid
-   "Modificar rejilla"
    (form-to [:post (str "/combat/" pad-name "/grid")]
             (label "posx" "Offset X")
             (text-field "posx" posx)[:br]
@@ -88,11 +91,11 @@
             (text-field "posy" posy)[:br]
             (label "gridsize" "Anchura")
             (text-field "gridsize" grid-size)[:br]
-            (submit-button "Modificar"))])
+            (submit-button "Modificar"))]])
 
 (defn- create-character [{pad-name :name}]
+  [(accordion-header "Crear personaje")
   [:section#create_character
-   "Crear personaje"
    (multipart-form (form-to
                     [:post (str "/combat/" pad-name "/character")]
                     (label "charname" "Nombre")
@@ -100,14 +103,14 @@
                     (label "avatar" "Avatar")
                     (file-upload "avatar")[:br]
                     (submit-button "Crear")
-                    ))])
-            
-(defn- show-actions [combat-data] [:section#actions
-                                   (unordered-list
-                                    (map #(% combat-data)
-                                     [ upload-form
-                                      change-grid-form
-                                      create-character] ))])
+                    ))]])
+
+
+(defn- show-actions [combat-data] (vec (concat [:section#actions {:class "accordion"}]
+                                     (upload-form combat-data)
+                                     (change-grid-form combat-data)
+                                     (create-character combat-data))))
+
 (defn show-state [combat-name {order :order description :description}]
   [:div
    [:a { :href (str "/combat/" combat-name "/state/" order)} description]

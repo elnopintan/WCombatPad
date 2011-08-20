@@ -74,4 +74,26 @@ float: left;
 div.combat_link  > form {
 float: left;
 }
- 
+
+.ui-icon {
+width: 21px;
+height: 21px;
+position:absolute;
+
+}
+
+.ui-icon-triangle-1-e {
+background-image:url("/files/images/sword.jpeg");
+} 
+.ui-icon-triangle-1-s {
+background-image:url("/files/images/sword_v.jpeg");
+}
+
+.ui-accordion-header > div {
+margin-left: 21px;
+}
+
+.ui-accordion-content {
+margin-top:10px;
+margin-left: 24px;
+}

@@ -16,6 +16,9 @@ function setupMat() {
 				     {name: name, posx: posX, posy: posY},
 				     function (data) { $("body").html(data);
 						       setupMat();})
-}})}
+
+}})
+    $(".accordion").accordion();
+}
 
 $(setupMat)
