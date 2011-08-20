@@ -57,6 +57,9 @@
 (defn generate-copy-name [char-name characters]
   (let [char-names (set (map :name characters))]
     (first (filter #(not (char-names %)) (map #(str char-name %)(iterate inc 1))))))
+(defn accordion-header [data]
+  [:a {:href "#" } [:div data]])
+
 (defn- show-character [{char-name :name image :avatar} pad-name characters]
   [(accordion-header [:div.character-name
    [:img {:src (str "/remote/images/chars/" image) :width "30px" :height "30px" }]
@@ -70,8 +73,7 @@
    (reduce concat [] (map #(show-character % pad-name characters) characters)))))
 (defn- multipart-form [form]
   (assoc form 1 (assoc (get form 1) :enctype "multipart/form-data" )))
-(defn accordion-header [data]
-  [:a {:href "#" } [:div data]])
+
 (defn- upload-form [{pad-name :name}]
   [(accordion-header "Nueva imagen")
   [:section#upload_form
