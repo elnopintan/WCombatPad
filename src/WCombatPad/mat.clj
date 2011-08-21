@@ -8,6 +8,7 @@
                                 change-grid
                                 set-new-character
                                 move-character
+                                resize-character
                                 )])
   (:use [WCombatPad.images :only (save-image-file)])
   (:use [ring.util.response :only (redirect)])
@@ -26,25 +27,29 @@
             "/files/js/mat.js")]))))
 
 
-(defn- show-character-position [ grid-size [offset-x offset-y]  number {image :avatar  [x y] :pos char-name :name}]
+(defn- show-character-position [ grid-size [offset-x offset-y]  number {image :avatar  [x y] :pos char-name :name size :size}]
   [:img.token {:id char-name :src (str "/remote/images/chars/" image) :style (str "z-index: 10; width:"
-                                      grid-size "px; height:" grid-size "px; top:"
+                                      (* size grid-size) "px; height:" (* size grid-size) "px; top:"
                                       (+ offset-y (* y grid-size)) "px; left:"
                                       (+ offset-x (- (* x grid-size) (* grid-size number))) "px;")} ])
 
+(defn sum-chars-seq [characters]
+  (reductions  #(+ %1 (%2 :size)) 0 characters))
+(defn sum-chars [characters]
+  (reduce #(+ %1 (%2 :size)) 0 characters))
+
 (defn- show-mat [{combat-name :name mat :mat grid-size :grid-size offset :offset  characters :characters order :order}]
   [:section#mat
-   (map (partial show-character-position grid-size offset) (iterate inc 0) characters)
+   (map (partial show-character-position grid-size offset) (sum-chars-seq characters) characters)
    [:div#position {:style (str "width:" (- grid-size 4) "px;"
                                "height:" (- grid-size 4) "px;"
                                ) } ""]
-   [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left:-" (* grid-size (count characters)) "px;") }]
+   [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left:-" (* grid-size (sum-chars characters)) "px;") }]
    ])
 
 
   
 (defn- copy-avatar-form [pad-name copy-name image]
-
   [:section.copy_form
    "Copiar Avatar"
    (form-to [:post (str "/combat/" pad-name "/character")]
@@ -54,18 +59,28 @@
             (hidden-field "avatar" image) 
             (hidden-field "copy" "yes"))])
 
+(defn- resize-avatar-form [pad-name char-name size]
+  [:section.resize_form
+   "Cambiar Tamaño"
+   (form-to [:post (str "/combat/" pad-name "/resize")]
+            (label "size" "Tamaño")
+            (text-field "size" size)
+            (hidden-field "name" char-name)
+            (submit-button "Cambiar"))])
+
 (defn generate-copy-name [char-name characters]
   (let [char-names (set (map :name characters))]
     (first (filter #(not (char-names %)) (map #(str char-name %)(iterate inc 1))))))
 (defn accordion-header [data]
   [:a {:href "#" } [:div data]])
 
-(defn- show-character [{char-name :name image :avatar} pad-name characters]
+(defn- show-character [{char-name :name image :avatar size :size} pad-name characters]
   [(accordion-header [:div.character-name
    [:img {:src (str "/remote/images/chars/" image) :width "30px" :height "30px" }]
    char-name ])
    [:div.character
-   (unordered-list [(copy-avatar-form pad-name (generate-copy-name char-name characters) image)])
+    (unordered-list [(copy-avatar-form pad-name (generate-copy-name char-name characters) image)
+                     (resize-avatar-form pad-name char-name size)])
    ]])
 
 (defn- show-characters [{characters :characters pad-name :name }]
@@ -182,3 +197,6 @@
   (do (move-character combat-name char-name [posx posy])
       (html (show-body (get-combat-data combat-name)))))
 
+(defn save-resize [combat-name char-name size]
+  (do (resize-character combat-name char-name size)
+      (redirect (str "/combat/" combat-name))))

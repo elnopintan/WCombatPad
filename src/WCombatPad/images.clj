@@ -53,7 +53,7 @@
 
 (defn paint-characters [graphics image {characters :characters grid-size :grid-size [offset-x offset-y] :offset }]
   (do (print characters) (doall (map
-          (fn [{avatar :avatar [off-char-x off-char-y] :pos}]
+          (fn [{avatar :avatar [off-char-x off-char-y] :pos size :size}]
             (let [char-image (ImageIO/read (load-image-file "chars" avatar))
                   pos-x (+ (* off-char-x grid-size) offset-x 1)
                   pos-y (+ (* off-char-y grid-size) offset-y 1)]
@@ -62,7 +62,7 @@
                (.drawImage
                graphics char-image
                pos-x pos-y
-               (- grid-size 1) (- grid-size 1) nil)
+               (- (* size grid-size) 1) (- (* size grid-size) 1) nil)
               )))
           characters))))
 
