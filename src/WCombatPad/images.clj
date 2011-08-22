@@ -44,7 +44,7 @@
 
 (defn paint-grid [graphics image {[offset-x offset-y] :offset  grid-size :grid-size} ]
   (let [width (.getWidth image)
-        height (.getWidth image)]
+        height (.getHeight image)]
   (do   (.setColor graphics Color/BLACK)
         (doall (map #(.drawLine graphics 0 % width %)
              (take-while #(< % height) (iterate #(+ grid-size %) offset-y))))
