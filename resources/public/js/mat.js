@@ -4,7 +4,7 @@ function setupMat() {
 	$("#position").css("visibility",false);
        // $("#position").css("top",e.pageY+gridSize-(e.pageY%gridSize)-offsetY).css("left",e.pageX-(e.pageX%gridSize)-offsetX);
                });
-    $(".token").draggable({ grid: [gridSize,gridSize],
+    $(".token").draggable({ grid: [gridSize+1,gridSize+1],
                           stop: function (event, ui) {
 			      var aMap=$("#map");
 			      var posX=$(this).offset().left-aMap.offset().left;
