@@ -97,5 +97,10 @@
               (str "Tamaño de " character-name " modificado")
               (str "Resize"character-name)
               :character-change {:name character-name :size size}))
+(defn kill-character [combat-name character-name dead]
+  (next-state combat-name
+              (str character-name (if (= dead "yes") " muere" " vive"))
+              (str "Life" character-name)
+              :character-change {:name character-name :dead dead}))
 
 (defn get-state-list [combat-name]  (fetch :combat-status :only [:order :description] :where {:name combat-name} )) 

@@ -10,7 +10,7 @@
  (:use [WCombatPad.core :only (filter-loged
                                show-login)])
  (:use [WCombatPad.mat :only (show-combat save-image save-grid save-character
-                                          save-move save-resize)])
+                                          save-move save-resize save-kill)])
  (:use [WCombatPad.list :only (show-list new-combat delete-combat)])
  (:use [WCombatPad.images :only (get-map get-image-state load-image-file)]))
 
@@ -63,6 +63,10 @@
         {{combat-name :combat-name char-name :name str-size :size } :params :as args}
         (let [ size (Integer. str-size)]
         (filter-loged args save-resize combat-name char-name size)))
+  (POST "/combat/:combat-name/kill"
+        {{combat-name :combat-name char-name :name dead :dead } :params :as args}
+        (filter-loged args save-kill combat-name char-name dead))
+
   (POST "/combat/:combat-name/grid"
         {{combat-name :combat-name str-posx :posx str-posy :posy str-grid-size :gridsize} :params :as args}
         (let [ posx (Integer. str-posx)

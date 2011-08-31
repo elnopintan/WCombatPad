@@ -9,6 +9,7 @@
                                 set-new-character
                                 move-character
                                 resize-character
+                                kill-character
                                 )])
   (:use [WCombatPad.images :only (save-image-file)])
   (:use [ring.util.response :only (redirect)])
@@ -39,13 +40,14 @@
   (reduce #(+ %1 (%2 :size)) 0 characters))
 
 (defn- show-mat [{combat-name :name mat :mat grid-size :grid-size offset :offset  characters :characters order :order}]
+  (let [alive-characters (filter #(not (= (% :dead) "yes")) characters)]
   [:section#mat
-   (map (partial show-character-position grid-size offset) (sum-chars-seq characters) characters)
-   [:div#position {:style (str "width:" (- grid-size 4) "px;"
+   (map (partial show-character-position grid-size offset) (sum-chars-seq characters) alive-characters)
+  [:div#position {:style (str "width:" (- grid-size 4) "px;"
                                "height:" (- grid-size 4) "px;"
                                ) } ""]
-   [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left:-" (* grid-size (sum-chars characters)) "px;") }]
-   ])
+   [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left:-" (* grid-size (sum-chars alive-characters)) "px;") }]
+   ]))
 
 
   
@@ -68,19 +70,31 @@
             (hidden-field "name" char-name)
             (submit-button "Cambiar"))])
 
+
+(defn- kill-avatar-form [pad-name char-name dead]
+  [:section.kill_form
+   (if (= dead "yes") "Revivir personaje" "Matar personaje")
+   (form-to [:post (str "/combat/" pad-name "/kill")]
+            (hidden-field "name" char-name)
+            (hidden-field "dead" (if (= dead "yes") "no" "yes")) 
+            (submit-button
+             (if (= dead "yes") "Revivir" "Matar")))])
+
+
 (defn generate-copy-name [char-name characters]
   (let [char-names (set (map :name characters))]
     (first (filter #(not (char-names %)) (map #(str char-name %)(iterate inc 1))))))
 (defn accordion-header [data]
   [:a {:href "#" } [:div data]])
 
-(defn- show-character [{char-name :name image :avatar size :size} pad-name characters]
+(defn- show-character [{char-name :name image :avatar size :size dead :dead } pad-name characters]
   [(accordion-header [:div.character-name
    [:img {:src (str "/remote/images/chars/" image) :width "30px" :height "30px" }]
-   char-name ])
+   char-name (if (= dead "yes") " (Muerto)" "")])
    [:div.character
     (unordered-list [(copy-avatar-form pad-name (generate-copy-name char-name characters) image)
-                     (resize-avatar-form pad-name char-name size)])
+                     (resize-avatar-form pad-name char-name size)
+                     (kill-avatar-form pad-name char-name dead)])
    ]])
 
 (defn- show-characters [{characters :characters pad-name :name }]
@@ -199,4 +213,7 @@
 
 (defn save-resize [combat-name char-name size]
   (do (resize-character combat-name char-name size)
+      (redirect (str "/combat/" combat-name))))
+(defn save-kill [combat-name char-name dead]
+  (do (kill-character combat-name char-name dead)
       (redirect (str "/combat/" combat-name))))

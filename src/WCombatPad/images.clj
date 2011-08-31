@@ -52,6 +52,7 @@
                     (take-while #(< % width) (iterate #(+ grid-size %) offset-x)))))))
 
 (defn paint-characters [graphics image {characters :characters grid-size :grid-size [offset-x offset-y] :offset }]
+  (let [alive-characters (filter #(not (= "yes" (% :dead))) characters) ]
   (do (print characters) (doall (map
           (fn [{avatar :avatar [off-char-x off-char-y] :pos size :size}]
             (let [char-image (ImageIO/read (load-image-file "chars" avatar))
@@ -64,7 +65,7 @@
                pos-x pos-y
                (- (* size grid-size) 1) (- (* size grid-size) 1) nil)
               )))
-          characters))))
+          alive-characters)))))
 
 (defn run-on-image [map-name order & funcs]
  (let [ {mat :mat :as mat-data} (get-combat-data map-name order)
