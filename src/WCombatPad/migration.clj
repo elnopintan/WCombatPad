@@ -12,3 +12,4 @@
                 (assoc data :characters
                        (map #(assoc % :size 1) (data :characters)))))
      (fetch :combat-status))))
+
