@@ -103,7 +103,7 @@
               (str "Life" character-name)
               :character-change {:name character-name :dead dead}))
 
-(defn get-state-list [combat-name]  (fetch :combat-status :only [:order :description] :where {:name combat-name} ))
+(defn get-state-list [combat-name]  (sort-by :order (fetch :combat-status :only [:order :description] :where {:name combat-name} ))
 
 (defn undo-action [combat-name]
   (destroy! :combat-status (get-combat-data combat-name)))
