@@ -16,16 +16,10 @@
   (:require (clojure.contrib [duck-streams :as ds])
   ))
 
-(defn- get-map-headers [{ mat-name :name grid-size :grid-size [offset-x offset-y] :offset } script]
-  (vec (concat
-        [:head
-   (include-css "/files/css/mat.css")]
+(defn- get-map-script [{ mat-name :name grid-size :grid-size [offset-x offset-y] :offset } script]
+  
    (if script
-     [[:script {:type "text/javascript"} (str "gridSize=" grid-size"; offsetX=" offset-x "; offsetY=" offset-y"; combatName='" mat-name "';" )]
-          (include-js 
-            "/files/js/jquery-1.6.1.min.js" 
-            "/files/js/jquery-ui-1.8.12.custom.min.js"
-            "/files/js/mat.js")]))))
+     [:script {:type "text/javascript"} (str "gridSize=" grid-size"; offsetX=" offset-x "; offsetY=" offset-y"; combatName='" mat-name "'; $(setupMat)" )]))
 
 
 (defn- show-character-position [ grid-size [offset-x offset-y]  number {image :avatar  [x y] :pos char-name :name size :size}]
@@ -154,7 +148,7 @@
                          (get-state-list combat-name)))])
 
 (defn show-body [{ combat-name :name :as combat-data }]
-  [:body (show-mat combat-data) 
+  [:div (show-mat combat-data) 
            [:nav
             (show-actions combat-data)
             (show-characters combat-data) 
@@ -164,17 +158,15 @@
   show-combat
   ([combat-name]
      (let [combat-data (get-combat-data combat-name)]
-     (html5 (get-map-headers combat-data true)
-           (show-body combat-data)
-           )))
+     [(get-map-script combat-data true)
+     (show-body combat-data)]
+           ))
   ([combat-name order]
      (let [combat-data (get-combat-data combat-name order)]
-       (html5
-        (get-map-headers combat-data false)
-        (show-mat combat-data)
+        [(show-mat combat-data)
         [:nav
          (show-state-list combat-name)
-         [:a {:href (str "/combat/" combat-name) } "Volver"]]))))
+         [:a {:href (str "/combat/" combat-name) } "Volver"]]])))
   
 
 (defn save-file [file-name dir stream]

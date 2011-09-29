@@ -8,7 +8,7 @@
   (:use ring.adapter.jetty)
  (:use ring.middleware.session.cookie)
  (:use [WCombatPad.core :only (filter-loged
-                               show-login)])
+                               show-login template )])
  (:use [WCombatPad.mat :only (show-combat save-image save-grid save-character
                                           save-move save-resize save-kill)])
  (:use [WCombatPad.list :only (show-list new-combat delete-combat)])
@@ -20,7 +20,7 @@
 (defroutes pad-routes
   (route/resources "/files")
   (GET "/" args (filter-loged args show-list ))
-  (GET "/login" {{redir :redirection :as session} :session} (show-login))
+  (GET "/login" {{redir :redirection :as session} :session} (template show-login ))
   (GET "/loged" {session :session} (if (session :loged) "HOLA" "ADIOS"))
   (POST "/login" {{redir :redirection :as session} :session {password :password} :params}
         (if (= password (System/getenv "WCOMBATPADPASS")) (assoc (redirect redir) :session (assoc session :loged true)) (redirect "/login")))

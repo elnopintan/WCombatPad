@@ -1,3 +1,5 @@
+$(".accordion").accordion();
+
 function setupMat() {
     $(document).mousemove(function(e){
         var aMap=$("#map");
@@ -21,4 +23,4 @@ function setupMat() {
     $(".accordion").accordion();
 }
 
-$(setupMat)
+

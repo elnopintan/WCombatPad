@@ -16,14 +16,12 @@
    ])
 (defn delete-combat [combat-name] (do (delete-pad combat-name)(redirect "/")))                   
 (defn show-list "Shows the list of the combats" [] 
-  (html5
-   [:head (include-css "/files/css/mat.css")]
-   [:div.combat_list
+   [[:div.combat_list
     (unordered-list
      (conj
      (map link-to-combat (get-pad-list))
      (form-to [:post "/combat"]
               (label "matname" "nuevo tablero")
               (text-field "matname" "")
-              (submit-button "Crear"))))]))
+              (submit-button "Crear"))))]])
    
