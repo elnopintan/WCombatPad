@@ -14,7 +14,7 @@
  (:use [WCombatPad.list :only (show-list new-combat delete-combat)])
  (:use [WCombatPad.images :only (get-map get-image-state load-image-file)]))
 
-(defn desanitize [a-str] (.replaceAll a-str "%3" "?"))
+(defn desanitize [a-str] (.replaceAll a-str "\\%3" "?"))
 
 (def store (cookie-store))
 (defroutes pad-routes
