@@ -83,7 +83,7 @@
 
 (defn- show-character [{char-name :name image :avatar size :size dead :dead } pad-name characters]
   [(accordion-header [:div.character-name
-   [:img {:src (str "/remote/images/chars/" image) :width "30px" :height "30px" }]
+   [:img {:src (str "/remote/images/chars/" (sanitize image)) :width "30px" :height "30px" }]
    char-name (if (= dead "yes") " (Muerto)" "")])
    [:div.character
     (unordered-list [(copy-avatar-form pad-name (generate-copy-name char-name characters) image)
