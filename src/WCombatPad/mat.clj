@@ -23,7 +23,7 @@
 
 (defn sanitize [a-str] (.replace a-str #"\\?" "%3"))
 (defn- show-character-position [ grid-size [offset-x offset-y]  number {image :avatar  [x y] :pos char-name :name size :size}]
-  [:img.token { :title char-name :id char-name :src (str "/remote/images/chars/" image) :style (str "z-index: 10; width:"
+  [:img.token { :title char-name :id char-name :src (str "/remote/images/chars/" (sanitize image)) :style (str "z-index: 10; width:"
                                       (* size grid-size) "px; height:" (* size grid-size) "px; top:"
                                       (+ offset-y (* y grid-size)) "px; left:"
                                       (+ offset-x (- (* x grid-size) (* grid-size number))) "px;")} ])
