@@ -2,6 +2,7 @@
   (:use hiccup.core)
   (:use hiccup.page-helpers)
   (:use hiccup.form-helpers)
+  (:use [ WCombatPad.core :only (template get-map-headers)])
   (:use [WCombatPad.data :only (get-combat-data
                                 set-image-uri
                                 get-state-list
@@ -157,16 +158,16 @@
 (defn
   show-combat
   ([combat-name]
-     (let [combat-data (get-combat-data combat-name)]
+     (template (let [combat-data (get-combat-data combat-name)]
      [(get-map-script combat-data true)
      (show-body combat-data)]
-           ))
+           )))
   ([combat-name order]
-     (let [combat-data (get-combat-data combat-name order)]
+     (template (let [combat-data (get-combat-data combat-name order)]
         [(show-mat combat-data)
         [:nav
          (show-state-list combat-name)
-         [:a {:href (str "/combat/" combat-name) } "Volver"]]])))
+         [:a {:href (str "/combat/" combat-name) } "Volver"]]]))))
   
 
 (defn save-file [file-name dir stream]

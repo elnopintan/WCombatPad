@@ -2,6 +2,7 @@
   (:use hiccup.core)
   (:use hiccup.page-helpers)
   (:use hiccup.form-helpers)
+  (:use [ WCombatPad.core :only (template get-map-headers)])
   (:use [ring.util.response :only (redirect)])
   (:use [ WCombatPad.data :only (get-pad-list create-pad delete-pad)]))
 
@@ -16,12 +17,12 @@
    ])
 (defn delete-combat [combat-name] (do (delete-pad combat-name)(redirect "/")))                   
 (defn show-list "Shows the list of the combats" [] 
-   [[:div.combat_list
+   (template [[:div.combat_list
     (unordered-list
      (conj
      (map link-to-combat (get-pad-list))
      (form-to [:post "/combat"]
               (label "matname" "nuevo tablero")
               (text-field "matname" "")
-              (submit-button "Crear"))))]])
+              (submit-button "Crear"))))]]))
    
