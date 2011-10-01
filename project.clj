@@ -4,6 +4,7 @@
                  [org.clojure/clojure-contrib "1.2.0"]
                  [ring/ring-jetty-adapter "0.3.9"]
                  [midje "1.1"]
+                 [org.jasypt/jasypt "1.7"]
 		[compojure "0.6.2"]
 		[hiccup "0.3.4"]
                 [net.java.dev.jets3t/jets3t "0.7.1"]

@@ -107,3 +107,12 @@
 
 (defn undo-action [combat-name]
   (destroy! :combat-status (get-combat-data combat-name)))
+
+(defn new-user [user]
+  (insert! :users user))
+
+(defn find-user [username]
+  (fetch-one :users :where { :user username}))
+
+(defn update-user [old new]
+  (update! :users old new))

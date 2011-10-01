@@ -12,6 +12,7 @@
  (:use [WCombatPad.mat :only (show-combat save-image save-grid save-character
                                           save-move save-resize save-kill)])
  (:use [WCombatPad.list :only (show-list new-combat delete-combat)])
+ (:use [WCombatPad.users :only (authenticate)])
  (:use [WCombatPad.images :only (get-map get-image-state load-image-file)]))
 
 (defn desanitize [a-str] (.replaceAll a-str "\\%3" "?"))
@@ -22,8 +23,8 @@
   (GET "/" args (filter-loged args show-list ))
   (GET "/login" {{redir :redirection :as session} :session} (show-login ))
   (GET "/loged" {session :session} (if (session :loged) "HOLA" "ADIOS"))
-  (POST "/login" {{redir :redirection :as session} :session {password :password} :params}
-        (if (= password (System/getenv "WCOMBATPADPASS")) (assoc (redirect redir) :session (assoc session :loged true)) (redirect "/login")))
+  (POST "/login" {{redir :redirection :as session} :session { user :user password :password} :params}
+        (let [loged-user (authenticate user password)] (if loged-user (assoc (redirect redir) :session (assoc session :user loged-user)) (redirect "/login"))))
   (POST "/combat"
         {{combat-name :matname} :params :as args}
         (filter-loged args new-combat combat-name))
