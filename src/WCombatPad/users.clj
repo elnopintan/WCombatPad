@@ -1,7 +1,7 @@
 (ns WCombatPad.users
   (:import  [org.jasypt.util.password StrongPasswordEncryptor])
-  (:use [WCombatPad.data :only (new-user find-user update-user) ])
-  (:use [WCombatPad.core :only (template)])
+  (:use [WCombatPad.data :only (new-user find-user update-user valid-ticket? use-ticket) ])
+  (:use [WCombatPad.template :only (template)])
   (:use hiccup.core)
   (:use hiccup.form-helpers)
   (:use ring.util.response)
@@ -38,34 +38,71 @@
   (let [user (find-user username)]
     (update-user user (assoc user :admin true))))
 
-(defn show-create-user [ error ticket]
+
+(defn modify-user [ {user :user } error]
   (template
-   [:div.user-creation
+   [[:div.user-change
+     (if error
+       [:div.error error])
+     (form-to [:post "/user/profile"]
+              (label "old" "Antiguo password") [:br]
+              (password-field "old" "") [:br]
+              (label "new" "Nuevo password") [:br]
+              (password-field "new" "") [:br]
+              (label "repeat" "Repite el password") [:br]
+              (password-field "repeat" "") [:br]
+              (submit-button "Modificar"))]]))
+  
+(defn show-create-user [ error ticket]
+  (if (valid-ticket? ticket)
+    (template
+   [[:div.user-creation
+     [:h3 "Registra a tu usuario"]
     (if error
       [:div.error error])
     (form-to [:post "/user/new"]
              (label "user" "Usuario") [:br]
              (text-field "user" "") [:br]
-             (label "password" "Password")[:br]
-             (password-field "password" "")[:br]
-             (label "repeat" "Repite el Password")
-             (password-field "password" "repeat")
-             (hidden-field "ticket" ticket))]))
+             (label "pass" "Password")[:br]
+             (password-field "pass" "")[:br]
+             (label "repeat" "Repite el Password")[:br]
+             (password-field "repeat" "")
+             (hidden-field "ticket" ticket)[:br]
+             (submit-button "Registrar"))]])
+  ticket))
 
-   (defn redirect-with-error [redirection error]
-     (assoc (redirect redirection) :session {:error error}))
-   
-   (defn do-create-user [ticket user password repeat]
-     (cond
-      (find-user) (assoc
-                      (redirect-with-error 
+(defn redirect-correct
+  ( [redirection]
+      (redirect-correct redirection {}))
+  ([redirection session]
+     (assoc (redirect redirection) :session (dissoc session :error))))
+(defn redirect-with-error
+  ([redirection error]
+     (redirect-with-error redirection error {}))
+  ([redirection error session]
+     (assoc (redirect redirection) :session (assoc session :error error))))
+
+(defn do-modify-user [ {user :user} old password repeat session]
+  (cond
+   (not (change-password user old password repeat)) (redirect-with-error
+                                                      (str "/user/" user)
+                                                      "Password erroneo o no coinciden los passwords"
+                                                      session)
+   :else (redirect-correct "/" session)))
+
+  
+(defn do-create-user [ticket user password repeat]
+  (cond
+   (not (valid-ticket? ticket)) (redirect "/")
+   (find-user user) (redirect-with-error 
                        (str "/user/new/" ticket)
-                       "Existe un usario con ese nombre"))
-      (not (create-user)) (assoc
-                              (redirect-with-error
+                       "Existe un usuario con ese nombre")
+   (not (create-user user password repeat ))(redirect-with-error
                                 (str "/user/new/" ticket)
-                                "Las passwords no coinciden"))
-      :else (redirect "/login")))
+                                "Los passwords no coinciden")
+   :else (do
+           (use-ticket ticket user)
+           (redirect-correct "/"))))
    
                                
        

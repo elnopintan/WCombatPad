@@ -2,7 +2,7 @@
   (:use hiccup.core)
   (:use hiccup.page-helpers)
   (:use hiccup.form-helpers)
-  (:use [ WCombatPad.core :only (template get-map-headers)])
+  (:use [WCombatPad.template ])
   (:use [WCombatPad.data :only (get-combat-data
                                 set-image-uri
                                 get-state-list
@@ -11,6 +11,7 @@
                                 move-character
                                 resize-character
                                 kill-character
+                                exists-pad?
                                 )])
   (:use [WCombatPad.images :only (save-image-file)])
   (:use [ring.util.response :only (redirect)])
@@ -157,17 +158,21 @@
 
 (defn
   show-combat
-  ([combat-name]
-     (template (let [combat-data (get-combat-data combat-name)]
+  ([{ user :user} combat-name]
+     (if (exists-pad? combat-name)
+     (template-with-user user (let [combat-data (get-combat-data combat-name)]
      [(get-map-script combat-data true)
      (show-body combat-data)]
-           )))
-  ([combat-name order]
-     (template (let [combat-data (get-combat-data combat-name order)]
+     ))
+     (redirect "/")))
+  ([{user :user } combat-name order]
+     (if (exists-pad? combat-name)
+     (template-with-user user  (let [combat-data (get-combat-data combat-name order)]
         [(show-mat combat-data)
         [:nav
          (show-state-list combat-name)
-         [:a {:href (str "/combat/" combat-name) } "Volver"]]]))))
+         [:a {:href (str "/combat/" combat-name) } "Volver"]]]))
+     (redirect "/"))))
   
 
 (defn save-file [file-name dir stream]
@@ -175,7 +180,7 @@
  ; (ds/copy stream (ds/file-str (str "resources/public/images/" dir "/" file-name)))
   )
 
-(defn save-image [combat-name {img-name :filename stream :tempfile}]
+(defn save-image [_ combat-name {img-name :filename stream :tempfile}]
   (let [file-name (str combat-name img-name)]
   (do
     (save-file file-name "maps" stream)  
@@ -186,27 +191,27 @@
 (defn save-character-file [ file-name { stream :tempfile}]
   (save-file file-name "chars" stream))
 
-(defn save-character [combat-name character-name image copy]
+(defn save-character [{user :user} combat-name character-name image copy]
   (let [file-name (if copy image (str combat-name character-name (:filename image)))]
     (do
       (if (not copy)
-      (save-character-file file-name image))
+      (save-character-file user file-name image))
       (set-new-character combat-name character-name file-name)
       (redirect (str "/combat/" combat-name)))))
       
 
 
-(defn save-grid [combat-name posx posy grid-size]
-  (do (change-grid combat-name posx posy grid-size)
+(defn save-grid [{user :user} combat-name posx posy grid-size]
+  (do (change-grid user combat-name posx posy grid-size)
       (redirect (str "/combat/" combat-name))))
 
-(defn save-move [combat-name char-name posx posy]
-  (do (move-character combat-name char-name [posx posy])
+(defn save-move [{user :user} combat-name char-name posx posy]
+  (do (move-character user combat-name char-name [posx posy])
       (html (show-body (get-combat-data combat-name)))))
 
-(defn save-resize [combat-name char-name size]
-  (do (resize-character combat-name char-name size)
+(defn save-resize [{user :user} combat-name char-name size]
+  (do (resize-character user combat-name char-name size)
       (redirect (str "/combat/" combat-name))))
-(defn save-kill [combat-name char-name dead]
-  (do (kill-character combat-name char-name dead)
+(defn save-kill [{user :user} combat-name char-name dead]
+  (do (kill-character user combat-name char-name dead)
       (redirect (str "/combat/" combat-name))))

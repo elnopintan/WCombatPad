@@ -8,11 +8,15 @@
   (:use ring.adapter.jetty)
  (:use ring.middleware.session.cookie)
  (:use [WCombatPad.core :only (filter-loged
-                               show-login template )])
+                               show-login )])
+ (:use [WCombatPad.template :only (template)])
+ 
  (:use [WCombatPad.mat :only (show-combat save-image save-grid save-character
                                           save-move save-resize save-kill)])
  (:use [WCombatPad.list :only (show-list new-combat delete-combat)])
- (:use [WCombatPad.users :only (authenticate do-create-user show-create-user)])
+ (:use [WCombatPad.users :only (authenticate do-create-user show-create-user
+                                             modify-user do-modify-user )])
+ (:use [WCombatPad.tickets :only (show-tickets)])
  (:use [WCombatPad.images :only (get-map get-image-state load-image-file)]))
 
 (defn desanitize [a-str] (.replaceAll a-str "\\%3" "?"))
@@ -25,14 +29,22 @@
   (GET "/loged" {session :session} (if (session :loged) "HOLA" "ADIOS"))
   (POST "/login" {{redir :redirection :as session} :session { user :user password :password} :params}
         (let [loged-user (authenticate user password)] (if loged-user (assoc (redirect redir) :session (assoc session :user loged-user)) (redirect "/login"))))
+  (GET "/tickets" args (filter-loged args show-tickets))
   (GET "/user/new/:ticket" {{ticket :ticket} :params
                             {error :error} :session }
        (show-create-user error ticket))
   (POST "/user/new" {{ticket :ticket
                      user :user
-                     password :password
+                     password :pass
                       repeat :repeat } :params}
+        
         (do-create-user ticket user password repeat))
+  (GET "/user/profile" { {error :error} :session  :as args}
+       (filter-loged args modify-user  error))
+  (POST "/user/profile" {{ old :old new :new repeat :repeat} :params
+                       session :session
+                       :as args}
+        (filter-loged args do-modify-user old new repeat session))
   (POST "/combat"
         {{combat-name :matname} :params :as args}
         (filter-loged args new-combat combat-name))

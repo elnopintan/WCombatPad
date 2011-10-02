@@ -40,7 +40,7 @@
 
 
 (defn get-pad-list [] (fetch :pads))
-  
+(defn exists-pad? [pad-name] (fetch-one :pads :where {:_id pad-name}))  
 
 (defn create-id [name] (.replaceAll name " " "_"))
 
@@ -51,9 +51,9 @@
   )
 (defn delete-pad [id] (destroy! :pads (fetch-one :pads :where {:_id id})))
 
-(defn next-state [combat-name description type & changes]
+(defn next-state [user combat-name description type & changes]
   (let [last-state (get-combat-data combat-name)
-        map-changes (apply assoc {} changes)
+        map-changes (apply assoc {} :user user changes)
         chars (if (:character map-changes)
                 (conj (:characters last-state) (:character map-changes))
                 (:characters last-state))
@@ -79,26 +79,26 @@
 
 
 
-(defn change-grid [combat-name posx posy size]
-  (next-state combat-name (str "Cambio de rejilla ["posx " " posy "] " size)
+(defn change-grid [ user combat-name posx posy size]
+  (next-state user combat-name (str "Cambio de rejilla ["posx " " posy "] " size)
               "Grid" :offset [posx posy] :grid-size size))
 
-(defn set-new-character [combat-name character-name avatar]
-  (next-state combat-name (str "Nuevo Personaje "character-name) "NewCharacter" :character {:name character-name :avatar avatar :pos [0 0] :size 1 }
+(defn set-new-character [ user combat-name character-name avatar]
+  (next-state user combat-name (str "Nuevo Personaje "character-name) "NewCharacter" :character {:name character-name :avatar avatar :pos [0 0] :size 1 }
               ))
 
-(defn move-character [combat-name character-name pos]
-  (next-state combat-name
+(defn move-character [user combat-name character-name pos]
+  (next-state user combat-name
               (str character-name " movido")
               (str "Move"character-name)
               :character-change {:name character-name :pos pos}))
-(defn resize-character [combat-name character-name size]
-  (next-state combat-name
+(defn resize-character [user combat-name character-name size]
+  (next-state user combat-name
               (str "Tamaño de " character-name " modificado")
               (str "Resize"character-name)
               :character-change {:name character-name :size size}))
-(defn kill-character [combat-name character-name dead]
-  (next-state combat-name
+(defn kill-character [user combat-name character-name dead]
+  (next-state user combat-name
               (str character-name (if (= dead "yes") " muere" " vive"))
               (str "Life" character-name)
               :character-change {:name character-name :dead dead}))
@@ -116,3 +116,18 @@
 
 (defn update-user [old new]
   (update! :users old new))
+
+(defn save-ticket [ticket]
+  (insert! :tickets ticket))
+
+(defn get-tickets []
+  (fetch :tickets))
+
+(defn valid-ticket? [uuid]
+  (let [ticket (fetch-one :tickets :where {:uuid uuid})]
+    (and ticket (not (:used ticket)))))
+  
+
+(defn use-ticket [uuid user]
+  (let [ticket  (fetch-one :tickets :where {:uuid uuid})]
+    (update! :tickets ticket (assoc ticket :used true :user user))))

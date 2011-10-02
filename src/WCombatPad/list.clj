@@ -2,27 +2,35 @@
   (:use hiccup.core)
   (:use hiccup.page-helpers)
   (:use hiccup.form-helpers)
-  (:use [ WCombatPad.core :only (template get-map-headers)])
+  (:use [ WCombatPad.template ])
   (:use [ring.util.response :only (redirect)])
   (:use [ WCombatPad.data :only (get-pad-list create-pad delete-pad)]))
 
 
-(defn new-combat [combat-name] (do (create-pad combat-name)(redirect "/")))
-(defn- link-to-combat [{id :_id, combat-name :name}]
+(defn new-combat [{admin :admin} combat-name]
+  (do
+    (if admin (create-pad combat-name))
+    (redirect "/")))
+(defn- link-to-combat [ admin {id :_id, combat-name :name}]
   [:div.combat_link
    [:div]
    [:a {:href (str "/combat/" id)} combat-name]
-   (form-to [:delete (str "/combat/" id)] (submit-button "Borrar"))
+   (if admin
+     (form-to [:delete (str "/combat/" id)] (submit-button "Borrar")))
    [:div]
    ])
-(defn delete-combat [combat-name] (do (delete-pad combat-name)(redirect "/")))                   
-(defn show-list "Shows the list of the combats" [] 
-   (template [[:div.combat_list
+(defn delete-combat [{admin :adimn} combat-name]
+  (do (if admin (delete-pad combat-name))
+          (redirect "/")))                   
+(defn show-list "Shows the list of the combats" [ { user :user admin :admin } ] 
+  (template-with-user user
+   [[:div.combat_list
+     [:h3 "Combates"]
     (unordered-list
-     (conj
-     (map link-to-combat (get-pad-list))
-     (form-to [:post "/combat"]
+     (filter (complement nil?) (conj
+     (map (partial link-to-combat admin) (get-pad-list))
+     (if admin (form-to [:post "/combat"]
               (label "matname" "nuevo tablero")
               (text-field "matname" "")
-              (submit-button "Crear"))))]]))
+              (submit-button "Crear"))))))]]))
    
