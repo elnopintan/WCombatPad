@@ -14,19 +14,19 @@
 
 (defn template-body [user]
   [:div.menu
-    [:a {:href "/user/profile" } "Perfil"]])
+   [:a {:href "/user/profile" } "Perfil"] " "
+   [:a {:href "/exit" } "Salir" ]])
   
 (defmacro template-with-user [ user body]
    `(html5 (get-map-headers)
-           (vec
-            (concat
                [:body
                 (template-body ~user)
-                ]
-           ~body)))) 
+                (vec (concat [:div#main ]
+                             ~body))]))
 (defmacro template [body]
   `(html5 (get-map-headers)
-         (vec (concat
-           [:body
-            ]
-           ~body)))) 
+         [:body 
+          [:div.menu ]
+          (vec (concat
+                [:div#main]
+                ~body))])) 

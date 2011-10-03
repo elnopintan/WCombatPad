@@ -16,7 +16,7 @@ function setupMat() {
 			      var name=$(this).attr("id");
 			      $.post("/combat/"+combatName+"/move",
 				     {name: name, posx: posX, posy: posY},
-				     function (data) { $("body").html(data);
+				     function (data) { $("div#main").html(data);
 						       setupMat();})
 
 }})
