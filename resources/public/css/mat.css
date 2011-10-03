@@ -26,7 +26,8 @@ nav {
 }
 
 section#mat {
- #   width: 70%;
+    width: 70%;
+    overflow: hidden;
  #   height: 780px;
     float:left;
     clear:both;

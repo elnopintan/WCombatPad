@@ -42,7 +42,7 @@
   [:div#position {:style (str "width:" (- grid-size 4) "px;"
                                "height:" (- grid-size 4) "px;"
                                ) } ""]
-   [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left:-" (* grid-size (sum-chars alive-characters)) "px;") }]
+  [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left:-" (* grid-size (sum-chars alive-characters)) "px;") }]
    ]))
 
 
