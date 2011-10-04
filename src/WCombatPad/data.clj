@@ -74,8 +74,8 @@
            (dissoc (assoc next-state :order (inc (:order next-state))
                           :description description :type type) :_id)))))
  
-(defn set-image-uri [combat-name image-name]
-  (next-state  combat-name (str "Nuevo mapa " image-name) "MapImage" :mat image-name ))
+(defn set-image-uri [ user combat-name image-name]
+  (next-state user combat-name (str "Nuevo mapa " image-name) "MapImage" :mat image-name ))
 
 
 

@@ -175,16 +175,16 @@
      (redirect "/"))))
   
 
-(defn save-file [file-name dir stream]
+(defn save-file [ file-name dir stream]
   (save-image-file file-name dir stream)
  ; (ds/copy stream (ds/file-str (str "resources/public/images/" dir "/" file-name)))
   )
 
-(defn save-image [_ combat-name {img-name :filename stream :tempfile}]
+(defn save-image [ {user :user} combat-name {img-name :filename stream :tempfile}]
   (let [file-name (str combat-name img-name)]
   (do
     (save-file file-name "maps" stream)  
-    (set-image-uri combat-name file-name)
+    (set-image-uri user combat-name file-name)
     (redirect (str "/combat/" combat-name))
     )))
 
@@ -195,8 +195,8 @@
   (let [file-name (if copy image (str combat-name character-name (:filename image)))]
     (do
       (if (not copy)
-      (save-character-file user file-name image))
-      (set-new-character combat-name character-name file-name)
+      (save-character-file file-name image))
+      (set-new-character user combat-name character-name file-name)
       (redirect (str "/combat/" combat-name)))))
       
 
