@@ -30,7 +30,7 @@
 
 (defn load-image-file-remote [dir file-name]
   (let [service (s3-service)
-        bucket (.getBucket service "WCombatPad")]
+        bucket "WCombatPad"]
     (.getDataInputStream
      (.getObject service bucket (str dir "/" file-name)))))
 
