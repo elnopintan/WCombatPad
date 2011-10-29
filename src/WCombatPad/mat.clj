@@ -13,7 +13,7 @@
                                 kill-character
                                 exists-pad?
                                 )])
-  (:use [WCombatPad.images :only (save-image-file)])
+  (:use [WCombatPad.images :only ( save-image-file)])
   (:use [ring.util.response :only (redirect)])
   ;(:require (clojure.java [ io :as ds])
   )

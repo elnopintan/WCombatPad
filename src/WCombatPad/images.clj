@@ -12,6 +12,10 @@
 
 
 
+(defprotocol FileHandler
+  (save-a-file [this file-name dir file] "Saves a image")
+  (load-a-file [this dir file-name] "Load a image"))
+
 
 (defn s3-service []
   (let [accesskey (System/getenv "S3ACCESSKEY")
@@ -19,31 +23,37 @@
         (RestS3Service.
                  (AWSCredentials. accesskey secretkey))))
 
-(defn save-image-file-remote [file-name dir file]
-  (let [service (s3-service)
+(deftype S3Handler []
+  FileHandler
+  (save-a-file [ _ file-name dir file]
+    (let [service (s3-service)
         object  (S3Object. file)]
-    (do (.setKey object file-name)
-    (.putObject service (str "WCombatPad/" dir) object))))
-
-(defn save-image-file-local [file-name dir file]
-  (ds/copy file (ds/input-stream (str "resources/public/images/" dir "/" file-name))))
-
-(defn load-image-file-local [dir file-name]
-  (.openStream (URL. (str "http://localhost:3000/files/images/" dir "/" file-name))))
-
-(defn load-image-file-remote [dir file-name]
-  (let [service (s3-service)
+      (do (.setKey object file-name)
+          (.putObject service (str "WCombatPad/" dir) object))))
+  (load-a-file [ _ dir file-name]
+    (let [service (s3-service)
         bucket (.getBucket service "WCombatPad")]
-    (.getDataInputStream
-     (.getObject service bucket (str dir "/" file-name)))))
+      (.getDataInputStream
+       (.getObject service bucket (str dir "/" file-name)))))
+  )
+
+
+(deftype LocalHandler []
+  FileHandler
+  (save-a-file [ _ file-name dir a-file]
+    (ds/copy a-file (ds/file (str "resources/public/images/" dir "/" file-name)))
+    )
+  (load-a-file [ _ dir file-name]
+    (.openStream (URL. (str "http://localhost:3000/files/images/" dir "/" file-name)))))
+
+
 
 (if (= "remote" (System/getenv "PADMODE"))
-  (do
-    (def save-image-file save-image-file-remote)
-    (def load-image-file load-image-file-remote))
-  (do
-    (def save-image-file save-image-file-local)
-    (def load-image-file load-image-file-local)))
+  (def img-handler (S3Handler.))
+  (def img-handler (LocalHandler.)))
+
+(def save-image-file (partial save-a-file img-handler))
+(def load-image-file (partial load-a-file img-handler))
 
 (defn paint-grid [graphics image {[offset-x offset-y] :offset  grid-size :grid-size} ]
   (let [width (.getWidth image)

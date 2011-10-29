@@ -68,7 +68,7 @@
        (let [order (Integer. str-order)]
          (get-image-state combat-name order)))
   (GET "/remote/images/:dir/:file-name.:extension" [dir file-name extension]
-       (load-image-file dir (str (desanitize file-name) "." extension)))
+       (load-image-file  dir (str (desanitize file-name) "." extension)))
   (POST "/combat/:combat-name/map"
         {{combat-name :combat-name image :image } :params :as args}
         (filter-loged args save-image combat-name image))
