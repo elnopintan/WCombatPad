@@ -7,8 +7,11 @@
   (:import org.jets3t.service.security.AWSCredentials)
   (:import org.jets3t.service.impl.rest.httpclient.RestS3Service)
   (:import org.jets3t.service.model.S3Object)
-  (:require (clojure.contrib [duck-streams :as ds]))
+  (:require (clojure.java [io :as ds]))
   (:use [WCombatPad.data :only (get-combat-data)]))
+
+
+
 
 (defn s3-service []
   (let [accesskey (System/getenv "S3ACCESSKEY")
@@ -23,7 +26,7 @@
     (.putObject service (str "WCombatPad/" dir) object))))
 
 (defn save-image-file-local [file-name dir file]
-  (ds/copy file (ds/file-str (str "resources/public/images/" dir "/" file-name))))
+  (ds/copy file (ds/input-stream (str "resources/public/images/" dir "/" file-name))))
 
 (defn load-image-file-local [dir file-name]
   (.openStream (URL. (str "http://localhost:3000/files/images/" dir "/" file-name))))

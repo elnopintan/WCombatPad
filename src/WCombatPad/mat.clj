@@ -15,8 +15,8 @@
                                 )])
   (:use [WCombatPad.images :only (save-image-file)])
   (:use [ring.util.response :only (redirect)])
-  (:require (clojure.contrib [duck-streams :as ds])
-  ))
+  ;(:require (clojure.java [ io :as ds])
+  )
 
 (defn- get-map-script [{ mat-name :name grid-size :grid-size [offset-x offset-y] :offset } script]
   
