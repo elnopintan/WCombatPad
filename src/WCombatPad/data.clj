@@ -51,57 +51,97 @@
   )
 (defn delete-pad [id] (destroy! :pads (fetch-one :pads :where {:_id id})))
 
-(defn next-state [user combat-name description type & changes]
+(defprotocol MatState
+  (get-next-state [this prev-state] "Generates next state for a mat")
+  (get-type [this] )
+  (get-desc [this] )
+  )
+
+(deftype ImageState [uri]
+  MatState
+  (get-next-state [this prev-state]
+    (assoc prev-state :mat (.uri this)))
+  (get-type [this] "MapImage")
+  (get-desc [this] (str "Nuevo mapa " (.uri this))))
+
+(deftype GridState [ offset size]
+  MatState
+  (get-next-state [this prev-state]
+    (assoc prev-state :offset (.offset this) :grid-size (.size this)))
+  (get-type [this] "Grid")
+  (get-desc [this] (str "Cambio de rejilla " (.offset this) " " (.size this)))
+  )
+
+(deftype NewCharState [ charname avatar]
+  MatState
+  (get-next-state [this prev-state]
+    (let [{chars :characters } prev-state
+          chars (set chars)]
+      (assoc prev-state :characters (conj chars {:avatar (.avatar this) :name (.charname this) :pos [ 0 0] :size 1 }))))  
+  (get-type [this] "NewCharacter")
+  (get-desc [this] (str "Nuevo Personaje " (.charname this))))
+
+(defn change-character [ prev-state  charname field value ]
+  (let [{chars :characters } prev-state 
+        {[char] true  other-chars false} (group-by #(= charname (:name %)) chars) ]
+    (assoc prev-state :characters (conj other-chars (assoc char field value)))))
+
+(deftype MoveCharState [ charname pos]
+  MatState
+  (get-next-state [this prev-state]
+      (change-character prev-state (.charname this) :pos pos))
+  (get-type [this] (str "Move" (.charname this)))
+  (get-desc [this] (str (.charname this) " Movido")))
+
+(deftype ResizeCharState [ charname size]
+  MatState
+  (get-next-state [this prev-state]
+    (change-character prev-state (.charname this) :size size))
+  (get-type [this] (str "Resize" (.charname this)))
+  (get-desc [this] (str "Tamaño de " (.charname this) " Modificado")))
+
+(deftype KillCharState [ charname dead]
+  MatState
+  (get-next-state [this prev-state]
+    (change-character prev-state (.charname this) :dead dead))
+  (get-type [this] (str "Life" (.charname this)))
+  (get-desc [this] (str (.charname this) " está " (if (= "yes" dead) "muerto" "vivo"))))
+
+  
+(defn next-state [user combat-name ^WCombatPad.data.MatState state]
   (let [last-state (get-combat-data combat-name)
-        map-changes (apply assoc {} :user user changes)
-        chars (if (:character map-changes)
-                (conj (:characters last-state) (:character map-changes))
-                (:characters last-state))
-        char-change (map-changes :character-change)
-        changed-chars (if char-change
-                      (map #(if (= (:name %) (:name char-change))
-                              (merge % char-change)
-                              %)
-                           chars)
-                      chars)      
-        changes-with-chars (assoc (dissoc map-changes :character :character-change) :characters changed-chars)
-        next-state (merge last-state changes-with-chars)]
-  (if (= (:type last-state) type)
-    (update!
-     :combat-status  last-state (assoc next-state :description description))
-    (insert!
-     :combat-status
-           (dissoc (assoc next-state :order (inc (:order next-state))
-                          :description description :type type) :_id)))))
+        new-state (assoc (get-next-state state last-state) :user user)
+        type (get-type state)
+        description (get-desc state)]
+    (if (= (:type last-state) type)
+      (update!
+       :combat-status  last-state (assoc new-state :description description ))
+      (insert!
+       :combat-status
+       (dissoc (assoc new-state :order (inc (:order new-state))
+                      :description description :type type :_id))))))
  
 (defn set-image-uri [ user combat-name image-name]
-  (next-state user combat-name (str "Nuevo mapa " image-name) "MapImage" :mat image-name ))
+  (next-state user combat-name (ImageState. image-name)))
 
 
 
 (defn change-grid [ user combat-name posx posy size]
-  (next-state user combat-name (str "Cambio de rejilla ["posx " " posy "] " size)
-              "Grid" :offset [posx posy] :grid-size size))
+  (next-state user combat-name (GridState. [posx posy] size)))
+             
 
 (defn set-new-character [ user combat-name character-name avatar]
-  (next-state user combat-name (str "Nuevo Personaje "character-name) "NewCharacter" :character {:name character-name :avatar avatar :pos [0 0] :size 1 }
-              ))
+  (next-state user combat-name (NewCharState. character-name avatar )))
+
 
 (defn move-character [user combat-name character-name pos]
-  (next-state user combat-name
-              (str character-name " movido")
-              (str "Move"character-name)
-              :character-change {:name character-name :pos pos}))
+  (next-state user combat-name (MoveCharState. character-name pos)))
+
 (defn resize-character [user combat-name character-name size]
-  (next-state user combat-name
-              (str "Tamaño de " character-name " modificado")
-              (str "Resize"character-name)
-              :character-change {:name character-name :size size}))
+  (next-state user combat-name (ResizeCharState. character-name size)))
+             
 (defn kill-character [user combat-name character-name dead]
-  (next-state user combat-name
-              (str character-name (if (= dead "yes") " muere" " vive"))
-              (str "Life" character-name)
-              :character-change {:name character-name :dead dead}))
+  (next-state user combat-name (KillCharState. character-name dead)))
 
 (defn get-state-list [combat-name]  (sort-by :order (fetch :combat-status :only [:order :description] :where {:name combat-name} )))
 

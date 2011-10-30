@@ -95,7 +95,8 @@
 
 (defn- show-characters [{characters :characters pad-name :name }]
   (vec (concat [:section#characters {:class "accordion"}]
-   (reduce concat [] (map #(show-character % pad-name characters) characters)))))
+               (reduce concat [] (map #(show-character % pad-name characters) (sort-by :name characters))))))
+
 (defn- multipart-form [form]
   (assoc form 1 (assoc (get form 1) :enctype "multipart/form-data" )))
 
