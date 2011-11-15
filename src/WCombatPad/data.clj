@@ -76,7 +76,7 @@
   MatState
   (get-next-state [this prev-state]
     (let [{chars :characters } prev-state
-          ]
+          chars (set chars)]
       (assoc prev-state :characters (conj chars {:avatar (.avatar this) :name (.charname this) :pos [ 0 0] :size 1 }))))  
   (get-type [this] "NewCharacter")
   (get-desc [this] (str "Nuevo Personaje " (.charname this))))
