@@ -11,24 +11,24 @@ width: 5em;
 
 section#mat {
 # height: 300px;
-#   width:200px;
+# width:200px;
 }
 
 section#actions, section#state-list, section#characters,section#mat {
-   margin-top: 1em; 
+   margin-top: 1em;
    margin-left: 1em;
    font-family: sans-serif;
    
 }
 
-nav { 
-	float:right;
+nav {
+float:right;
 }
 
 section#mat {
-#    width: 60%;
-#    overflow: hidden;
- #   height: 780px;
+# width: 60%;
+# overflow: hidden;
+ # height: 780px;
     float:left;
     clear:both;
 }
@@ -44,7 +44,7 @@ position: relative;
 left: 0px;
 }
 img.token {
-position: absolute;
+position: relative;
 left: 120px;
 top: 20px;
 z-index: 10;
@@ -72,7 +72,7 @@ clear:both;
 div.combat_link > a {
 float: left;
 }
-div.combat_link  > form {
+div.combat_link > form {
 float: left;
 }
 
@@ -85,7 +85,7 @@ position:absolute;
 
 .ui-icon-triangle-1-e {
 background-image:url("/files/images/sword.jpeg");
-} 
+}
 .ui-icon-triangle-1-s {
 background-image:url("/files/images/sword_v.jpeg");
 }

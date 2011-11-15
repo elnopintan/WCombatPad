@@ -1,24 +1,9 @@
 $(".accordion").accordion();
-var mapPos=null;
-function reallocatePlayers () {
-    $(".token").offset( function (i, pos) { return {left: pos.left +mapPos.left, 
-                                                top:  pos.top + mapPos.top };});}
-$("document").ready(function() { 
-    var aMap=$("#map");   
-    if (mapPos==null)
-    {
-	mapPos=aMap.offset();
-    }
-    reallocatePlayers();
-    
-});
-//return {left: pos.left +$("#map").offset().left; 
-//				      top: pos.top + $("#map").offset().top; }; });
+
 function setupMat() {
-    var aMap=$("#map");
-     $(document).mousemove(function(e){
+    $(document).mousemove(function(e){
         var aMap=$("#map");
-	$("#position").css("visibility",false);
+$("#position").css("visibility",false);
        // $("#position").css("top",e.pageY+gridSize-(e.pageY%gridSize)-offsetY).css("left",e.pageX-(e.pageX%gridSize)-offsetX);
                });
     $(".token").draggable({ grid: [gridSize,gridSize],
@@ -32,12 +17,9 @@ function setupMat() {
 			      $.post("/combat/"+combatName+"/move",
 				     {name: name, posx: posX, posy: posY},
 				     function (data) { $("div#main").html(data);
-						       setupMat();
-						       reallocatePlayers();})
+						       setupMat();})
 
-}})
+			  }})
     $(".accordion").accordion();
-
 }
-
 
