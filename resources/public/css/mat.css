@@ -44,7 +44,7 @@ position: relative;
 left: 0px;
 }
 img.token {
-position: relative;
+position: absolute;
 left: 120px;
 top: 20px;
 z-index: 10;

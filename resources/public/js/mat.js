@@ -1,6 +1,16 @@
 $(".accordion").accordion();
+var mapPos=null;
 
+//return {left: pos.left +$("#map").offset().left; 
+//				      top: pos.top + $("#map").offset().top; }; });
 function setupMat() {
+    var aMap=$("#map");
+    if (mapPos==null)
+    {
+	mapPos=aMap.offset();
+    }
+    $(".token").offset( function (i, pos) { return {left: pos.left +mapPos.left, 
+                                                    top:  pos.top + mapPos.top };});
     $(document).mousemove(function(e){
         var aMap=$("#map");
 	$("#position").css("visibility",false);
@@ -9,9 +19,9 @@ function setupMat() {
     $(".token").draggable({ grid: [gridSize,gridSize],
                           stop: function (event, ui) {
 			      var aMap=$("#map");
-			      var posX=($(this).offset().left-aMap.offset().left)+1;
+			      var posX=($(this).offset().left-aMap.offset().left);
 			      posX=(posX-posX%gridSize)/gridSize;
-			      var posY=($(this).offset().top-aMap.offset().top)+1;
+			      var posY=($(this).offset().top-aMap.offset().top);
 			      posY=(posY-posY%gridSize)/gridSize;
 			      var name=$(this).attr("id");
 			      $.post("/combat/"+combatName+"/move",
@@ -21,6 +31,7 @@ function setupMat() {
 
 }})
     $(".accordion").accordion();
+
 }
 
 
