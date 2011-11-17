@@ -37,7 +37,7 @@
 (defn- show-mat [{combat-name :name mat :mat grid-size :grid-size offset :offset characters :characters order :order}]
   (let [alive-characters (filter #(not (= (% :dead) "yes")) characters)]
     [:section#mat
-     (map (partial show-character-position grid-size offset) (sum-chars-seq characters) alive-characters)
+     (map (partial show-character-position grid-size offset) (sum-chars-seq alive-characters) alive-characters)
      [:div#position {:style (str "width:" (- grid-size 4) "px;"
                                  "height:" (- grid-size 4) "px;"
                                  ) } ""]
