@@ -23,6 +23,7 @@ section#actions, section#state-list, section#characters,section#mat {
 
 nav {
 float:right;
+background-color:white;
 }
 
 section#mat {
@@ -42,7 +43,9 @@ img#map {
 float:both;
 position: absolute;
 left: 0px;
+z-index: -1;
 }
+
 img.token {
 position: absolute;
 left: 120px;
