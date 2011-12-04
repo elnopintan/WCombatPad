@@ -23,25 +23,27 @@
     [:script {:type "text/javascript"} (str "gridSize=" grid-size"; offsetX=" offset-x "; offsetY=" offset-y"; combatName='" mat-name "'; $(setupMat)" )]))
 
 (defn sanitize [a-str] (.replaceAll a-str "\\?" "%3"))
-(defn- show-character-position [ grid-size [offset-x offset-y] number {image :avatar [x y] :pos char-name :name size :size}]
+(defn- show-character-position [ grid-size [offset-x offset-y] [pos-x pos-y] {image :avatar [x y] :pos char-name :name size :size}]
   [:img.token { :title char-name :id char-name :src (str "/remote/images/chars/" (sanitize image)) :style (str "z-index: 10; width:"
                                                                                                                (* size grid-size) "px; height:" (* size grid-size) "px; top:"
-                                                                                                               (+ offset-y (* y grid-size)) "px; left:"
-                                                                                                               (+ offset-x (- (* x grid-size) (* grid-size number))) "px;")} ])
+                                                                                                               (+ pos-y offset-y (* y grid-size)) "px; left:"
+                                                                                                               (+ pos-x offset-x (* x grid-size)) "px;")} ])
 
 (defn sum-chars-seq [characters]
   (reductions #(+ %1 (%2 :size)) 0 characters))
 (defn sum-chars [characters]
   (reduce #(+ %1 (%2 :size)) 0 characters))
 
-(defn- show-mat [{combat-name :name mat :mat grid-size :grid-size offset :offset characters :characters order :order}]
-  (let [alive-characters (filter #(not (= (% :dead) "yes")) characters)]
+(defn show-mat [{combat-name :name mat :mat grid-size :grid-size offset :offset characters :characters order :order}]
+  (let [alive-characters (filter #(not (= (% :dead) "yes")) characters)
+        mat-pos [10 50] ]
     [:section#mat
-     (map (partial show-character-position grid-size offset) (sum-chars-seq alive-characters) alive-characters)
+     (map (partial show-character-position grid-size offset mat-pos)  alive-characters)
      [:div#position {:style (str "width:" (- grid-size 4) "px;"
                                  "height:" (- grid-size 4) "px;"
                                  ) } ""]
-     [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left:-" (* grid-size (sum-chars alive-characters)) "px;") }]
+     [:img#map {:src (str "/combat/" combat-name "/map/" order) :style (str "left: " (first  mat-pos) "px;"
+                                                                            " top: " (second mat-pos) "px") }]
      ]))
 
 

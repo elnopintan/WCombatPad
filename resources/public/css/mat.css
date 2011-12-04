@@ -40,11 +40,11 @@ width:0;
 
 img#map {
 float:both;
-position: relative;
+position: absolute;
 left: 0px;
 }
 img.token {
-position: relative;
+position: absolute;
 left: 120px;
 top: 20px;
 z-index: 10;
