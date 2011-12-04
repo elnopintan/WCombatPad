@@ -9,9 +9,9 @@ $("#position").css("visibility",false);
     $(".token").draggable({ grid: [gridSize,gridSize],
                           stop: function (event, ui) {
 			      var aMap=$("#map");
-			      var posX=($(this).offset().left-aMap.offset().left)+1;
+			      var posX=($(this).offset().left-(aMap.offset().left+offsetX))+1;
 			      posX=(posX-posX%gridSize)/gridSize;
-			      var posY=($(this).offset().top-aMap.offset().top)+1;
+			      var posY=($(this).offset().top-(aMap.offset().top+offsetY))+1;
 			      posY=(posY-posY%gridSize)/gridSize;
 			      var name=$(this).attr("id");
 			      $.post("/combat/"+combatName+"/move",
