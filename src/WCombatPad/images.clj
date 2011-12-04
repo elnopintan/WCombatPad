@@ -84,16 +84,15 @@
 
 (defn run-on-image [{mat :mat :as mat-data} & funcs]
  (let [ image (ImageIO/read (load-image-file "maps" mat))
-        graphics (.createGraphics image)]
+       graphics (.createGraphics image)
+       ostream (ByteArrayOutputStream.)]
     (do
-        (doall (map #(% graphics image mat-data) funcs))
-        image)))
+      (doall (map #(% graphics image mat-data) funcs))
+      (ImageIO/write image "png" ostream)
+      (.toByteArray ostream))))
 
 (defn create-stream [image]
-  (let [ output-stream (ByteArrayOutputStream.)]
-    (do
-      (ImageIO/write image "png" output-stream)
-      (ByteArrayInputStream. (.toByteArray output-stream)))))
+      (ByteArrayInputStream. image))
       
 
 
