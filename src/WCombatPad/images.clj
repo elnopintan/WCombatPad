@@ -7,10 +7,13 @@
   (:import org.jets3t.service.security.AWSCredentials)
   (:import org.jets3t.service.impl.rest.httpclient.RestS3Service)
   (:import org.jets3t.service.model.S3Object)
+  (:require fogus.clache)
+  (:import fogus.clache.LRUCache)
   (:require (clojure.java [io :as ds]))
   (:use [WCombatPad.data :only (get-combat-data)]))
 
 
+(def cache (atom (.seed (LRUCache. nil nil nil 50) {})))
 
 (defprotocol FileHandler
   (save-a-file [this file-name dir file] "Saves a image")

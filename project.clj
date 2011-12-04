@@ -7,7 +7,9 @@
 		[hiccup "0.3.7"]
                 [ring/ring-jetty-adapter "1.0.0-RC1"]
                 [net.java.dev.jets3t/jets3t "0.7.1"]
-                [congomongo "0.1.7"]]
+                [congomongo "0.1.7"]
+                [clache "0.7.0"]
+                ]
   :dev-dependencies [[lein-eclipse "1.0.0"]
                      [lein-ring "0.4.6"]]
   :ring {:handler WCombatPad.routes/pad-web})
