@@ -13,7 +13,7 @@
                                 kill-character
                                 exists-pad?
                                 )])
-  (:use [WCombatPad.images :only ( save-image-file)])
+  (:use [WCombatPad.images :only (save-image-file)])
   (:use [ring.util.response :only (redirect)])
                                         ;(:require (clojure.java [ io :as ds])
   )
@@ -211,6 +211,7 @@
 (defn save-resize [{user :user} combat-name char-name size]
   (do (resize-character user combat-name char-name size)
       (redirect (str "/combat/" combat-name))))
+
 (defn save-kill [{user :user} combat-name char-name dead]
   (do (kill-character user combat-name char-name dead)
       (redirect (str "/combat/" combat-name))))

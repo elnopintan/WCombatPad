@@ -1,5 +1,6 @@
 (ns WCombatPad.data
-  (:use somnium.congomongo))
+  (:use somnium.congomongo)
+  (:use [ WCombatPad.cache :only (invalidate)]))
 
 
 
@@ -122,11 +123,12 @@
                       :description description :type type :_id))))))
  
 (defn set-image-uri [ user combat-name image-name]
+  (invalidate image-name)
   (next-state user combat-name (ImageState. image-name)))
 
 
-
 (defn change-grid [ user combat-name posx posy size]
+  (invalidate (:mat (get-combat-data combat-name)))
   (next-state user combat-name (GridState. [posx posy] size)))
              
 

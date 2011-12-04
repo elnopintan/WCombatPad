@@ -7,13 +7,12 @@
   (:import org.jets3t.service.security.AWSCredentials)
   (:import org.jets3t.service.impl.rest.httpclient.RestS3Service)
   (:import org.jets3t.service.model.S3Object)
-  (:require fogus.clache)
-  (:import fogus.clache.LRUCache)
+  (:use [WCombatPad.cache :only (from-cache)]) 
   (:require (clojure.java [io :as ds]))
   (:use [WCombatPad.data :only (get-combat-data)]))
 
 
-(def cache (atom (.seed (LRUCache. nil nil nil 50) {})))
+
 
 (defprotocol FileHandler
   (save-a-file [this file-name dir file] "Saves a image")
@@ -83,21 +82,28 @@
               )))
           alive-characters)))))
 
-(defn run-on-image [map-name order & funcs]
- (let [ {mat :mat :as mat-data} (get-combat-data map-name order)
-        image (ImageIO/read (load-image-file "maps" mat))
-        output-stream (ByteArrayOutputStream.)
+(defn run-on-image [{mat :mat :as mat-data} & funcs]
+ (let [ image (ImageIO/read (load-image-file "maps" mat))
         graphics (.createGraphics image)]
     (do
         (doall (map #(% graphics image mat-data) funcs))
-        (ImageIO/write image "png" output-stream)
-        (ByteArrayInputStream. (.toByteArray output-stream)))))
+        image)))
+
+(defn create-stream [image]
+  (let [ output-stream (ByteArrayOutputStream.)]
+    (do
+      (ImageIO/write image "png" output-stream)
+      (ByteArrayInputStream. (.toByteArray output-stream)))))
+      
+
+
 
 (defn get-map [map-name order]
-  (run-on-image map-name order paint-grid))
+  (let [ {mat :mat :as mat-data} (get-combat-data map-name order)]
+    (create-stream (from-cache mat #(run-on-image mat-data paint-grid)))))
 
 (defn get-image-state [map-name order]
-  (run-on-image map-name order paint-grid paint-characters))
+  (create-stream (run-on-image (get-combat-data map-name order) paint-grid paint-characters)))
 
 
 
