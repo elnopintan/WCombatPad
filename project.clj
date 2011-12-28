@@ -9,6 +9,7 @@
                 [net.java.dev.jets3t/jets3t "0.7.1"]
                 [congomongo "0.1.7"]
                 [clache "0.7.0"]
+                [org.clojure/tools.nrepl "0.0.5"]
                 ]
   :dev-dependencies [[lein-eclipse "1.0.0"]
                      [lein-ring "0.4.6"]]

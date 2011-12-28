@@ -12,15 +12,26 @@
             "/files/js/jquery-ui-1.8.12.custom.min.js"
             "/files/js/mat.js")])
 
-(defn template-body [user]
+
+(defn template-body [root user]
   [:div.menu
+   (if (not root) [:a {:href "/" } "Volver" ]) " "
    [:a {:href "/user/profile" } "Perfil"] " "
    [:a {:href "/exit" } "Salir" ]])
-  
-(defmacro template-with-user [ user body]
+
+(defmacro template-for-root-with-user
+  [user body]
    `(html5 (get-map-headers)
                [:body
-                (template-body ~user)
+                (template-body true ~user)
+                (vec (concat [:div#main ]
+                             ~body))]))  
+
+(defmacro template-with-user
+  [user body]
+   `(html5 (get-map-headers)
+               [:body
+                (template-body false ~user)
                 (vec (concat [:div#main ]
                              ~body))]))
 (defmacro template [body]

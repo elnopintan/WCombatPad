@@ -23,7 +23,7 @@
   (do (if admin (delete-pad combat-name))
           (redirect "/")))                   
 (defn show-list "Shows the list of the combats" [ { user :user admin :admin } ] 
-  (template-with-user user
+  (template-for-root-with-user user
    [[:div.combat_list
      [:h3 "Combates"]
     (unordered-list
