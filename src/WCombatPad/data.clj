@@ -40,7 +40,7 @@
   ))
 
 
-(defn get-pad-list [] (fetch :pads))
+(defn get-pad-list [] (reverse (fetch :pads)))
 (defn exists-pad? [pad-name] (fetch-one :pads :where {:_id pad-name}))  
 
 (defn create-id [name] (.replaceAll name " " "_"))
