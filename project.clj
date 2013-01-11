@@ -1,4 +1,4 @@
-(defproject WCombatPad "1.0.1"
+(defproject WCombatPad "1.0.2"
   :description "FIXME: write description"
   :dependencies [[org.clojure/clojure "1.3.0"]
                 [midje "1.3-alpha4"]
@@ -7,7 +7,7 @@
 		[hiccup "0.3.7"]
                 [ring/ring-jetty-adapter "1.0.0-RC1"]
                 [net.java.dev.jets3t/jets3t "0.7.1"]
-                [congomongo "0.1.7"]
+                [congomongo "0.4.0"]
                 [clache "0.7.0"]
                 [org.clojure/tools.nrepl "0.0.5"]
                 ]
