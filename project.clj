@@ -14,4 +14,5 @@
                 ]
   :plugins [[lein-eclipse "1.0.0"]
                      [lein-ring "0.9.6"]]
+  :min-lein-version "2.0.0"
   :ring {:handler WCombatPad.routes/pad-web})
