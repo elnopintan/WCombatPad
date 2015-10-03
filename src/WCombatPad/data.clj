@@ -11,6 +11,7 @@
           port (Integer. str-port)
           conn (make-connection db :host host :port port)]
        (do (set-connection! conn)
+          (println (str user " " password)
           (authenticate conn user password)))))
   
 
