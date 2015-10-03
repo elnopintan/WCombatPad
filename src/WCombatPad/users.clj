@@ -3,7 +3,7 @@
   (:use [WCombatPad.data :only (new-user find-user update-user valid-ticket? use-ticket) ])
   (:use [WCombatPad.template :only (template)])
   (:use hiccup.core)
-  (:use hiccup.form-helpers)
+  (:use hiccup.form)
   (:use ring.util.response)
   )
 

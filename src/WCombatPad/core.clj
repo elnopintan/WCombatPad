@@ -1,7 +1,7 @@
 (ns WCombatPad.core
   (:use hiccup.core)
-  (:use hiccup.page-helpers)
-  (:use hiccup.form-helpers)
+  (:use hiccup.page)
+  (:use hiccup.form)
   (:use [WCombatPad.users :only (authenticate)])
   (:use [WCombatPad.template :only (template)])
   (:use [ring.util.response :only (redirect)]))
