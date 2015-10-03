@@ -1,7 +1,8 @@
 (ns WCombatPad.list
   (:use hiccup.core)
-  (:use hiccup.page-helpers)
-  (:use hiccup.form-helpers)
+  (:use hiccup.page)
+  (:use hiccup.form)
+  (:use hiccup.element)
   (:use [ WCombatPad.template ])
   (:use [ring.util.response :only (redirect)])
   (:use [ WCombatPad.data :only (get-pad-list create-pad delete-pad)]))

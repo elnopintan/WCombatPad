@@ -1,7 +1,8 @@
 (ns WCombatPad.mat
   (:use hiccup.core)
-  (:use hiccup.page-helpers)
-  (:use hiccup.form-helpers)
+  (:use hiccup.page)
+  (:use hiccup.form)
+  (:use hiccup.element)
   (:use [WCombatPad.template ])
   (:use [WCombatPad.data :only (get-combat-data
                                 set-image-uri

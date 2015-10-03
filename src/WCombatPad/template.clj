@@ -1,7 +1,7 @@
 (ns WCombatPad.template
   (:use hiccup.core)
-  (:use hiccup.page-helpers)
-  (:use hiccup.form-helpers)
+  (:use hiccup.page)
+  (:use hiccup.form)
 )
 
 (defn get-map-headers []
