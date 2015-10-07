@@ -59,14 +59,14 @@
   (DELETE "/combat/:combat-name"
           {{combat-name :combat-name} :params :as args}
           (filter-loged args delete-combat combat-name))
+  (GET "/combat/:combat-name/state/:order.png"
+       {{combat-name :combat-name str-order :order} :params :as args}
+       (let [order (Integer. str-order)]
+         (get-image-state combat-name order))) 
   (GET "/combat/:combat-name/map/:order"
        {{combat-name :combat-name str-order :order} :params :as args}
        (let [order (Integer. str-order)]
        (get-map combat-name order)))
-  (GET "/combat/:combat-name/state/:order.png"
-       {{combat-name :combat-name str-order :order} :params :as args}
-       (let [order (Integer. str-order)]
-         (get-image-state combat-name order)))
   (GET "/remote/images/:dir/:file-name.:extension" [dir file-name extension]
        (load-image-file  dir (str (desanitize file-name) "." extension)))
   (POST "/combat/:combat-name/map"
