@@ -121,7 +121,7 @@
       (insert!
        :combat-status
        (dissoc (assoc new-state :order (inc (:order new-state))
-                      :description description :type type :_id))))))
+                      :description description :type type) :_id)))))
  
 (defn set-image-uri [ user combat-name image-name]
   (invalidate image-name)
