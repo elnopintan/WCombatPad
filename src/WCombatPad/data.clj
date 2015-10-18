@@ -116,8 +116,8 @@
         type (get-type state)
         description (get-desc state)]
     (if (= (:type last-state) type)
-      (do (println "updating last state " (dissoc (assoc new-state :description description) :_id)) 
-          (update! :combat-status last-state (dissoc (assoc new-state :description description) :_id)))
+      (let [result (dissoc (assoc new-state :description description) :_id)] 
+          (update! :combat-status last-state (dissoc result)))
       (insert!
        :combat-status
        (dissoc (assoc new-state :order (inc (:order new-state))
