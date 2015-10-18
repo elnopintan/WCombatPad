@@ -117,7 +117,7 @@
         description (get-desc state)]
     (if (= (:type last-state) type)
       (let [result (dissoc (assoc new-state :description description) :_id)] 
-          (update! :combat-status last-state (dissoc result)))
+          (update! :combat-status last-state result))
       (insert!
        :combat-status
        (dissoc (assoc new-state :order (inc (:order new-state))
