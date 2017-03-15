@@ -60,9 +60,6 @@
        {{combat-name :combat-name str-order :order} :params :as args}
        (let [order (Integer. str-order)]
          (filter-loged args show-combat combat-name order)))
-  (DELETE "/combat/:combat-name"
-          {{combat-name :combat-name} :params :as args}
-          (filter-loged args delete-combat combat-name)) 
   (GET "/combat/:combat-name/map/:order"
        {{combat-name :combat-name str-order :order} :params :as args}
        (let [order (Integer. str-order)]

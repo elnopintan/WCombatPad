@@ -18,8 +18,6 @@
     [:div.combat_link
      [:div]
      [:a {:href (str "/combat/" id)} combat-name]
-     (if admin
-       (form-to [:delete (str "/combat/" id)] (submit-button "Borrar")))
      [:div]
      ]))
 
