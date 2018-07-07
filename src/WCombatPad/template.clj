@@ -10,6 +10,7 @@
    (include-js 
             "/files/js/jquery-1.6.1.min.js" 
             "/files/js/jquery-ui-1.8.12.custom.min.js"
+            "/files/js/jquery.ui.touch-punch.min.js"
             "/files/js/mat.js")])
 
 
@@ -17,7 +18,8 @@
   [:div.menu
    (if (not root) [:a {:href "/" } "Volver" ]) " "
    [:a {:href "/user/profile" } "Perfil"] " "
-   [:a {:href "/exit" } "Salir" ]])
+   [:a {:href "/exit" } "Salir" ] " "
+   (if (not root) [:a.nav-trigger {:href "#" } "Menú" ]) ])
 
 (defmacro template-for-root-with-user
   [user body]
