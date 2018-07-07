@@ -1,103 +1,165 @@
-body {
-font-size: 0.8em;
+html {
+   font-size: 14px;
 }
 
-form > input {
-font-size: 0.8em;
+form, form * {
+   font-size: 0.8rem;
+   margin-bottom: 0.5em;
 }
+
+form > input[type=text] {
+   margin: 0.5em 1em 0 1em;
+   padding: 0.3em 0.5em;
+}
+
+form > input[type=submit], form > input[type=file] {
+   margin-top: 1em;
+   padding: 0.2em 0.4em;
+}
+
 section#change_grid > form > input {
-width: 5em;
+   width: 5em;
 }
 
 section#mat {
-# height: 300px;
-# width:200px;
+   /*# height: 300px;*/
+   /*# width:200px;*/
+   /*# width: 60%;*/
+   /*# overflow: hidden;*/
+   /*# height: 780px;*/
+   float: left;
+   clear: both;
 }
 
 section#actions, section#state-list, section#characters,section#mat {
    margin-top: 1em;
    margin-left: 1em;
    font-family: sans-serif;
-   
+}
+
+.menu a {
+   padding: 0 0.2em;
+}
+
+.menu .nav-trigger {
+   float: right;
 }
 
 nav {
-float:right;
-background-color:white;
+   float: right;
+   background-color: white;
+   position: relative;
+   z-index: 100;
+   display: none;
 }
 
-section#mat {
-# width: 60%;
-# overflow: hidden;
- # height: 780px;
-    float:left;
-    clear:both;
+nav.active {
+   display: block;
+}
+
+nav.fixed {
+   float: none;
+   width: 100%;
+   position: relative;
+   top: 0;
+   left: 0;
+}
+
+nav.fixed section {
+   font-size: 1rem;
+}
+
+nav.fixed section section {
+   font-size: 1rem;
+}
+
+.mobile nav form, .mobile nav form * {
+   font-size: 2.5rem;
+}
+
+.mobile-xl nav form, .mobile-xl nav form * {
+   font-size: 1.5rem;
+}
+
+.tablet nav form, .tablet nav form * {
+   font-size: 1rem;
 }
 
 section#tokens {
-float:left;
-width:0;
+   float: left;
+   width: 0;
 }
 
 img#map {
-float:both;
-position: absolute;
-left: 0px;
-z-index: -1;
+   /*float:both;*/
+   position: absolute;
+   left: 0;
+   z-index: -1;
 }
 
 img.token {
-position: absolute;
-left: 120px;
-top: 20px;
-z-index: 10;
-float:left;
+   position: absolute;
+   left: 120px;
+   top: 20px;
+   z-index: 10;
+   float: left;
 }
 
 div#position {
-position: absolute;
-float:left;
-visibility:hidden;
-border: 2px solid #ffffff;
-z-index: 10;
+   position: absolute;
+   float: left;
+   visibility: hidden;
+   border: 2px solid #ffffff;
+   z-index: 10;
 }
 
 div.combat_list {
-clear:both;
+   clear: both;
 }
+
 div.combat_link {
-clear:both;
+   clear: both;
 }
 
 div.combat_link > div {
-clear:both;
+   clear: both;
 }
+
 div.combat_link > a {
-float: left;
+   float: left;
 }
+
 div.combat_link > form {
-float: left;
+   float: left;
 }
 
 .ui-icon {
-width: 21px;
-height: 21px;
-position:absolute;
-
+   width: 21px;
+   height: 21px;
+   position: absolute;
 }
 
 .ui-icon-triangle-1-e {
-background-image:url("/files/images/sword.jpeg");
+   background-image:url("/files/images/sword.jpeg");
+   background-repeat: no-repeat;
+   background-size: contain;
 }
+
 .ui-icon-triangle-1-s {
-background-image:url("/files/images/sword_v.jpeg");
+   background-image: url("/files/images/sword_v.jpeg");
+   background-repeat: no-repeat;
+   background-size: contain;
 }
 
 .ui-accordion-header > div {
-margin-left: 21px;
+   margin-left: 21px;
 }
 
 .ui-accordion-content {
-margin-top:10px;
-margin-left: 24px;
+   margin-top: 10px;
+   margin-left: 24px;
+}
+
+#characters .character-name img {
+   margin: 0 5px;
 }
