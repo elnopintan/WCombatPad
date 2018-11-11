@@ -6,7 +6,7 @@
 		[compojure "1.4.0"]
 		[hiccup "1.0.5"]
                 [javax.servlet/servlet-api "2.5"]
-                [ring "1.4.0"]
+                [ring "1.7.1"]
                 [net.java.dev.jets3t/jets3t "0.7.1"]
                 [congomongo "0.4.6"]
                  [clache "0.7.0"]
