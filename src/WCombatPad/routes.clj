@@ -6,7 +6,7 @@
   (:require [clojure.tools.logging :as log])
   (:use ring.middleware.session.store)
   (:use ring.util.response)
-  (:use ring.adapter.jetty)
+ (:use ring.adapter.jetty)
  (:use ring.middleware.session.cookie)
  (:use [WCombatPad.core :only (filter-loged
                                show-login )])
