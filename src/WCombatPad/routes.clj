@@ -3,7 +3,7 @@
   (:use [hiccup.middleware :only (wrap-base-url)])
   (:require [compojure.handler :as handler])
   (:require [compojure.route :as route])
-  (:require [clojure.tools.logging :as log]))
+  (:require [clojure.tools.logging :as log])
   (:use ring.middleware.session.store)
   (:use ring.util.response)
   (:use ring.adapter.jetty)
