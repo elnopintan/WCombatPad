@@ -3,6 +3,7 @@
   (:use [hiccup.middleware :only (wrap-base-url)])
   (:require [compojure.handler :as handler])
   (:require [compojure.route :as route])
+  (:require [clojure.tools.logging :as log]))
   (:use ring.middleware.session.store)
   (:use ring.util.response)
   (:use ring.adapter.jetty)
@@ -100,5 +101,6 @@
 (def pad-web (wrap-base-url (handler/site pad-routes)))
 
 (defn -main []
+  (log/info "Starting app")
   (let [port (Integer/parseInt (System/getenv "PORT"))]
     (run-jetty pad-web {:port port})))
