@@ -1,10 +1,10 @@
 (ns WCombatPad.data
-  (:use somnium.congomongo)
+ ; (:use somnium.congomongo)
   (:use [ WCombatPad.cache :only (invalidate)]))
 
 
 
-(let [mongo-uri (System/getenv "MONGOLAB_URI")]
+(comment let [mongo-uri (System/getenv "MONGOLAB_URI")]
   (if (= (System/getenv "PADMODE") "local")
     (mongo! :db mongo-uri )
     (let [[ _ user password host str-port db] (re-matches  #"mongodb://([^:]*):([^@]*)@([^:]*):([^/]*)/([^ ]*)" mongo-uri)
@@ -30,28 +30,28 @@
 
 (defn get-combat-data
   ([combat-name]                                     ;  ejemplo
-  (let [
+  (comment let [
         number (fetch-count :combat-status :where {:name combat-name}) ]
     (if (> number 0)
       (get-combat-data combat-name (dec number))
       {:name combat-name  :offset [0 0] :grid-size 10 :order -1}
       )))
   ([combat-name order]
-  (fetch-one :combat-status :where {:name combat-name :order order })
+  (comment fetch-one :combat-status :where {:name combat-name :order order })
   ))
 
 
-(defn get-pad-list [] (reverse (fetch :pads)))
-(defn exists-pad? [pad-name] (fetch-one :pads :where {:_id pad-name}))  
+(defn get-pad-list [] (comment reverse (fetch :pads)))
+(defn exists-pad? [pad-name] (comment fetch-one :pads :where {:_id pad-name}))  
 
-(defn create-id [name] (.replaceAll name " " "_"))
+(defn create-id [name] (comment .replaceAll name " " "_"))
 
 (defn create-pad [name]
-  (insert! :pads
+  (comment insert! :pads
    {:_id (create-id name) :name name}
    )
   )
-(defn delete-pad [id] (destroy! :pads (fetch-one :pads :where {:_id id})))
+(defn delete-pad [id] (comment destroy! :pads (fetch-one :pads :where {:_id id})))
 
 (defprotocol MatState
   (get-next-state [this prev-state] "Generates next state for a mat")
@@ -111,7 +111,7 @@
 
   
 (defn next-state [user combat-name ^WCombatPad.data.MatState state]
-  (let [last-state (get-combat-data combat-name)
+  (comment let [last-state (get-combat-data combat-name)
         new-state (assoc (get-next-state state last-state) :user user)
         type (get-type state)
         description (get-desc state)]
@@ -143,31 +143,31 @@
 (defn kill-character [user combat-name character-name dead]
   (next-state user combat-name (KillCharState. character-name dead)))
 
-(defn get-state-list [combat-name]  (sort-by :order (fetch :combat-status :only [:order :description] :where {:name combat-name} )))
+(defn get-state-list [combat-name]  (comment sort-by :order (fetch :combat-status :only [:order :description] :where {:name combat-name} )))
 
 (defn undo-action [combat-name]
-  (destroy! :combat-status (get-combat-data combat-name)))
+  (comment destroy! :combat-status (get-combat-data combat-name)))
 
 (defn new-user [user]
-  (insert! :users user))
+  (comment insert! :users user))
 
 (defn find-user [username]
-  (fetch-one :users :where { :user username}))
+  (comment fetch-one :users :where { :user username}))
 
 (defn update-user [old new]
-  (update! :users old new))
+  (comment update! :users old new))
 
 (defn save-ticket [ticket]
-  (insert! :tickets ticket))
+  (comment insert! :tickets ticket))
 
 (defn get-tickets []
-  (fetch :tickets))
+  (comment fetch :tickets))
 
 (defn valid-ticket? [uuid]
-  (let [ticket (fetch-one :tickets :where {:uuid uuid})]
+  (comment let [ticket (fetch-one :tickets :where {:uuid uuid})]
     (and ticket (not (:used ticket)))))
   
 
 (defn use-ticket [uuid user]
-  (let [ticket  (fetch-one :tickets :where {:uuid uuid})]
+  (comment let [ticket  (fetch-one :tickets :where {:uuid uuid})]
     (update! :tickets ticket (assoc ticket :used true :user user))))
