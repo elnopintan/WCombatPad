@@ -13,3 +13,5 @@
                        (map #(assoc % :size 1) (data :characters)))))
      (fetch :combat-status))))
 
+(defn create-db []
+  )

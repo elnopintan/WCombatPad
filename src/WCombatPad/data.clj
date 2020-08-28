@@ -1,5 +1,6 @@
 (ns WCombatPad.data
- ; (:use somnium.congomongo)
+                                        ; (:use somnium.congomongo)
+  (:require [clojure.java.jdbc :as jdbc])
   (:use [ WCombatPad.cache :only (invalidate)]))
 
 
@@ -13,8 +14,14 @@
        (do (set-connection! conn)
           (println (str user " " password))
           (authenticate conn user password)))))
-  
 
+
+
+(def pg-uri
+  (let [pg-uri-str (System/getenv "POSTGRES_URI")
+        pg-uri-str (if (nil? pg-uri-str)  "jdbc:postgresql://localhost:5432/wcombatpad" pg-uri-str)]
+    (Class/forName "org.postgresql.Driver")
+  {:connection-uri pg-uri-str }))
 
 (def ejemplo
   {:name "ejemplo"
@@ -44,7 +51,8 @@
 (defn get-pad-list [] (comment reverse (fetch :pads)))
 (defn exists-pad? [pad-name] (comment fetch-one :pads :where {:_id pad-name}))  
 
-(defn create-id [name] (comment .replaceAll name " " "_"))
+(defn create-id [name] (comment .r
+                                eplaceAll name " " "_"))
 
 (defn create-pad [name]
   (comment insert! :pads
@@ -171,3 +179,10 @@
 (defn use-ticket [uuid user]
   (comment let [ticket  (fetch-one :tickets :where {:uuid uuid})]
     (update! :tickets ticket (assoc ticket :used true :user user))))
+
+(defn create-ticket-table []
+   (let [ddl (jdbc/create-table-ddl :tickets [[:name "varchar(100)" :primary :key]
+                                   [:url "varchar(200)"]
+                                   [:used "varchar(10)"]])]
+     (jdbc/db-do-commands pg-uri [ddl])))
+
