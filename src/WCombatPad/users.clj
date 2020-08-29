@@ -19,7 +19,6 @@
     (if (validate-password created-user repeated)
       (new-user created-user))))
   
-
 (defn authenticate [username password]
   (let [user (find-user username)]
     (if (validate-password user password)

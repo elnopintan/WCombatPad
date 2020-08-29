@@ -155,14 +155,26 @@
 (defn undo-action [combat-name]
   (comment destroy! :combat-status (get-combat-data combat-name)))
 
+(defn user-to-db [user]
+  (-> (assoc user :user_name (user :user))
+      (dissoc :user)))
+
+(defn user-from-db [user]
+  (-> (assoc user :user (user :user_name))
+      (dissoc :user_name)))
+
 (defn new-user [user]
-  (jdbc/insert! pg-uri :users user))
+  (print user)
+  (jdbc/insert! pg-uri :users (user-to-db user)))
 
 (defn find-user [username]
-  (first (jdbc/query pg-uri ["select * from users where user = ?" username]))
+  (->
+   (jdbc/query pg-uri ["select * from users where user_name = ?" username])
+   first
+   user-from-db))
 
-(defn update-user [old new]
-  (comment update! :users old new))
+(defn update-user [old new_user]
+  (jdbc/update! pg-uri :users {:password (new_user :password)} ["user_name = ?" (old :user)]))
 
 (defn save-ticket [ticket]
   (jdbc/insert! pg-uri :tickets ticket))
@@ -186,6 +198,6 @@
      (jdbc/db-do-commands pg-uri [ddl])))
 
 (defn create-users-table []
-  (let [ddl (jdbc/create-table-ddl :users [[:user "varchar(100)" :primary :key]
-                                          [:password "varchar(100)"]])]
+  (let [ddl (jdbc/create-table-ddl :users [[:user_name "varchar(100)" :primary :key]
+                                           [:password "varchar(100)"]])]
         (jdbc/db-do-commands pg-uri [ddl])))
