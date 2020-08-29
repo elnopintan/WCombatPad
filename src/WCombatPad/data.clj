@@ -1,5 +1,4 @@
 (ns WCombatPad.data
-                                        ; (:use somnium.congomongo)
   (:require [clojure.java.jdbc :as jdbc])
   (:use [ WCombatPad.cache :only (invalidate)]))
 
@@ -157,32 +156,36 @@
   (comment destroy! :combat-status (get-combat-data combat-name)))
 
 (defn new-user [user]
-  (comment insert! :users user))
+  (jdbc/insert! pg-uri :users user))
 
 (defn find-user [username]
-  (comment fetch-one :users :where { :user username}))
+  (first (jdbc/query pg-uri ["select * from users where user = ?" username]))
 
 (defn update-user [old new]
   (comment update! :users old new))
 
 (defn save-ticket [ticket]
-  (comment insert! :tickets ticket))
+  (jdbc/insert! pg-uri :tickets ticket))
 
 (defn get-tickets []
-  (comment fetch :tickets))
+  (jdbc/query pg-uri ["select * from tickets"]))
 
 (defn valid-ticket? [uuid]
-  (comment let [ticket (fetch-one :tickets :where {:uuid uuid})]
-    (and ticket (not (:used ticket)))))
-  
+  (not (nil? (first (jdbc/query pg-uri ["select * from tickets where uuid = ? and used is null" uuid])))))
 
 (defn use-ticket [uuid user]
-  (comment let [ticket  (fetch-one :tickets :where {:uuid uuid})]
-    (update! :tickets ticket (assoc ticket :used true :user user))))
+  (let [ticket (first (jdbc/query pg-uri ["select * from tickets where uuid = ? and name = ?" uuid user]))]
+           (print ticket)
+           (jdbc/update! pg-uri :tickets {:used "true"} ["uuid = ? and name = ?" uuid user])))
 
 (defn create-ticket-table []
-   (let [ddl (jdbc/create-table-ddl :tickets [[:name "varchar(100)" :primary :key]
+  (let [ddl (jdbc/create-table-ddl :tickets [[:name "varchar(100)" :primary :key]
+                                             [:uuid "varchar(100)"]
                                    [:url "varchar(200)"]
                                    [:used "varchar(10)"]])]
      (jdbc/db-do-commands pg-uri [ddl])))
 
+(defn create-users-table []
+  (let [ddl (jdbc/create-table-ddl :users [[:user "varchar(100)" :primary :key]
+                                          [:password "varchar(100)"]])]
+        (jdbc/db-do-commands pg-uri [ddl])))
