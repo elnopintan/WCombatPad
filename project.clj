@@ -11,10 +11,10 @@
                 [congomongo "0.4.6"]
                  [clache "0.7.0"]
                  [org.clojure/tools.logging "0.4.1"]
-
                                         ;                [org.clojure/tools.nrepl "0.0.5"]
                  [org.postgresql/postgresql "42.2.16"]
                  [org.clojure/java.jdbc "0.7.11"]
+                 [org.clojure/data.json "1.0.0"]
                  
                 ]
   :plugins [[lein-eclipse "1.0.0"]

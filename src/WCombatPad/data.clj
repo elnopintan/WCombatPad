@@ -1,20 +1,7 @@
 (ns WCombatPad.data
-  (:require [clojure.java.jdbc :as jdbc])
+  (:require [clojure.java.jdbc :as jdbc]
+            [clojure.data.json :as json])
   (:use [ WCombatPad.cache :only (invalidate)]))
-
-
-
-(comment let [mongo-uri (System/getenv "MONGOLAB_URI")]
-  (if (= (System/getenv "PADMODE") "local")
-    (mongo! :db mongo-uri )
-    (let [[ _ user password host str-port db] (re-matches  #"mongodb://([^:]*):([^@]*)@([^:]*):([^/]*)/([^ ]*)" mongo-uri)
-          port (Integer. str-port)
-          conn (make-connection db :host host :port port)]
-       (do (set-connection! conn)
-          (println (str user " " password))
-          (authenticate conn user password)))))
-
-
 
 (def pg-uri
   (let [pg-uri-str (System/getenv "POSTGRES_URI")
@@ -26,6 +13,7 @@
   {:name "ejemplo"
    :mat "almacen_hundido_bajo_parcial"
    :grid-size 21
+   :order 1
    :offset [8 18]
    :characters [{:name "cleric"
                  :avatar "https://secure.gravatar.com/avatar/9c3be996ad1960ae9eec9b82e0231880?s=140&d=https://gs1.wac.edgecastcdn.net/80460E/assets%2Fimages%2Fgravatars%2Fgravatar-140.png"
@@ -34,31 +22,36 @@
                  :avatar "https://secure.gravatar.com/avatar/9c3be996ad1960ae9eec9b82e0231880?s=140&d=https://gs1.wac.edgecastcdn.net/80460E/assets%2Fimages%2Fgravatars%2Fgravatar-140.png"
                  :pos [8 7]}]})
 
+(defn combat-status-to-db [status] {
+                                    :_id (str (:name status) "_" (:order status))
+                                    :name (:name status)
+                                    :ord_nu (:order status)
+                                    :values (json/write-str status)})
+(defn combat-status-from-db [row] (json/read-str (:values row) :key-fn keyword))
+
 (defn get-combat-data
   ([combat-name]                                     ;  ejemplo
-  (comment let [
-        number (fetch-count :combat-status :where {:name combat-name}) ]
+  (let [number (-> (jdbc/query pg-uri ["select count(*) as c from combat_status where name = ?" combat-name])
+                   first
+                   :c)]
     (if (> number 0)
-      (get-combat-data combat-name (dec number))
+      (combat-status-from-db (get-combat-data combat-name (dec number)))
       {:name combat-name  :offset [0 0] :grid-size 10 :order -1}
       )))
   ([combat-name order]
-  (comment fetch-one :combat-status :where {:name combat-name :order order })
-  ))
+   (combat-status-from-db (first (jdbc/query pg_uri ["select * from combat_status where name = ? and ord_nu = ?" combat-name order])))))
+(defn get-pad-list [] (jdbc/query pg-uri ["select * from pads order by ord_nu desc"]))
+(defn exists-pad? [pad-name] (> (:c (first (jdbc/query pg-uri ["select count(*) as c from pads where _id = ?" pad-name])))0))  
 
-
-(defn get-pad-list [] (comment reverse (fetch :pads)))
-(defn exists-pad? [pad-name] (comment fetch-one :pads :where {:_id pad-name}))  
-
-(defn create-id [name] (comment .r
-                                eplaceAll name " " "_"))
+(defn create-id [name] (.replaceAll name " " "_"))
 
 (defn create-pad [name]
-  (comment insert! :pads
+  (jdbc/insert! pg-uri :pads
    {:_id (create-id name) :name name}
    )
   )
-(defn delete-pad [id] (comment destroy! :pads (fetch-one :pads :where {:_id id})))
+(defn delete-pad [id]
+  (jdbc/delete! pg-uri :pads ["_id = ?" id]))
 
 (defprotocol MatState
   (get-next-state [this prev-state] "Generates next state for a mat")
@@ -118,14 +111,13 @@
 
   
 (defn next-state [user combat-name ^WCombatPad.data.MatState state]
-  (comment let [last-state (get-combat-data combat-name)
+  (let [last-state (get-combat-data combat-name)
         new-state (assoc (get-next-state state last-state) :user user)
         type (get-type state)
         description (get-desc state)]
-    (insert!
-     :combat-status
-     (dissoc (assoc new-state :order (inc (:order new-state))
-                    :description description :type type) :_id))))
+    (jdbc/insert! pg-uri :combat_status
+                  (combat-status-to-db (assoc new-state :order (inc (:order new-state))
+                    :description description :type type)))))
  
 (defn set-image-uri [ user combat-name image-name]
   (invalidate image-name)
@@ -201,3 +193,16 @@
   (let [ddl (jdbc/create-table-ddl :users [[:user_name "varchar(100)" :primary :key]
                                            [:password "varchar(100)"]])]
         (jdbc/db-do-commands pg-uri [ddl])))
+
+(defn create-pads-table []
+  (let [ddl (jdbc/create-table-ddl :pads [[:_id "varchar(200)" :primary :key]
+                                          [:ord_nu "serial"]
+                                          [:name "varchar(200)"]])]
+    (jdbc/db-do-commands pg-uri [ddl])))
+
+(defn create-combat-status-table []
+  (let [ddl (jdbc/create-table-ddl :combat_status [[:_id "varchar(200)" :primary :key]
+                                                   [:name "varchar(200)"]
+                                          [:ord_nu "bigint"]
+                                          [:values "text"]])]
+    (jdbc/db-do-commands pg-uri [ddl])))
