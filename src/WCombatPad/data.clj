@@ -27,6 +27,7 @@
                                     :name (:name status)
                                     :ord_nu (:order status)
                                     :values (json/write-str status)})
+
 (defn combat-status-from-db [row] (json/read-str (:values row) :key-fn keyword))
 
 (defn get-combat-data
@@ -35,11 +36,15 @@
                    first
                    :c)]
     (if (> number 0)
-      (combat-status-from-db (get-combat-data combat-name (dec number)))
+      (get-combat-data combat-name (dec number))
       {:name combat-name  :offset [0 0] :grid-size 10 :order -1}
       )))
   ([combat-name order]
-   (combat-status-from-db (first (jdbc/query pg_uri ["select * from combat_status where name = ? and ord_nu = ?" combat-name order])))))
+   (combat-status-from-db
+    (->
+     (jdbc/query pg-uri ["select * from combat_status where name = ? and ord_nu = ?" combat-name order])
+     first))))
+
 (defn get-pad-list [] (jdbc/query pg-uri ["select * from pads order by ord_nu desc"]))
 (defn exists-pad? [pad-name] (> (:c (first (jdbc/query pg-uri ["select count(*) as c from pads where _id = ?" pad-name])))0))  
 
@@ -109,15 +114,14 @@
   (get-type [this] (str "Life" (.charname this)))
   (get-desc [this] (str (.charname this) " está " (if (= "yes" dead) "muerto" "vivo"))))
 
-  
 (defn next-state [user combat-name ^WCombatPad.data.MatState state]
   (let [last-state (get-combat-data combat-name)
         new-state (assoc (get-next-state state last-state) :user user)
         type (get-type state)
         description (get-desc state)]
-    (jdbc/insert! pg-uri :combat_status
+    (map combat-status-from-db (jdbc/insert! pg-uri :combat_status
                   (combat-status-to-db (assoc new-state :order (inc (:order new-state))
-                    :description description :type type)))))
+                    :description description :type type))))))
  
 (defn set-image-uri [ user combat-name image-name]
   (invalidate image-name)
