@@ -4,7 +4,7 @@
   (:use [ WCombatPad.cache :only (invalidate)]))
 
 (def pg-uri
-  (let [pg-uri-str (str "jdbc:" (.replace (System/getenv "DATABASE_URL") "postgres:" "postgresql:")
+  (let [pg-uri-str (str "jdbc:" (.replaceAll (System/getenv "DATABASE_URL") "postgres:" "postgresql:"))
         pg-uri-str (if (nil? pg-uri-str)  "jdbc:postgresql://localhost:5432/wcombatpad" pg-uri-str)]
     (Class/forName "org.postgresql.Driver")
   {:connection-uri pg-uri-str }))
