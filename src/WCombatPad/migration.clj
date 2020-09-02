@@ -1,7 +1,6 @@
 (ns WCombatPad.migration
   (:use [somnium.congomongo])
-  (:use [WCombatPad.data :only (get-combat-data
-                                )])
+  (:require [WCombatPad.data :as d])
   )
 
 (defn set_default_sizes []
@@ -14,4 +13,7 @@
      (fetch :combat-status))))
 
 (defn create-db []
-  )
+  (d/create-ticket-table)
+  (d/create-users-table)
+  (d/create-pads-table)
+  (d/create-combat-status-table))
