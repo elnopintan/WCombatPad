@@ -152,8 +152,8 @@
   (comment destroy! :combat-status (get-combat-data combat-name)))
 
 (defn user-to-db [user]
-  (-> (assoc user :user_name (user :user))
-      (dissoc :user)))
+  (-> (assoc user :user_name (user :user) :admin (and (contains? :admin user) (:admin user)))
+      (dissoc :user))
 
 (defn user-from-db [user]
   (-> (assoc user :user (user :user_name))
@@ -195,7 +195,8 @@
 
 (defn create-users-table []
   (let [ddl (jdbc/create-table-ddl :users [[:user_name "varchar(100)" :primary :key]
-                                           [:password "varchar(100)"]])]
+                                           [:password "varchar(100)"]
+                                           [:admin "boolean"]])]
         (jdbc/db-do-commands pg-uri [ddl])))
 
 (defn create-pads-table []
