@@ -152,7 +152,7 @@
   (comment destroy! :combat-status (get-combat-data combat-name)))
 
 (defn user-to-db [user]
-  (-> (assoc user :user_name (user :user) :admin (and (contains? :admin user) (:admin user)))
+  (-> (assoc user :user_name (user :user) :admin (and (contains? user :admin) (:admin user)))
       (dissoc :user)))
 
 (defn user-from-db [user]
