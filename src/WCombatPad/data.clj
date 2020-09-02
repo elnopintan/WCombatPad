@@ -153,7 +153,7 @@
 
 (defn user-to-db [user]
   (-> (assoc user :user_name (user :user) :admin (and (contains? :admin user) (:admin user)))
-      (dissoc :user))
+      (dissoc :user)))
 
 (defn user-from-db [user]
   (-> (assoc user :user (user :user_name))
