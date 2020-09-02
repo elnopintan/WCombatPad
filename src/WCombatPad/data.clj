@@ -170,7 +170,8 @@
    user-from-db))
 
 (defn update-user [old new_user]
-  (jdbc/update! pg-uri :users {:password (new_user :password)} ["user_name = ?" (old :user)]))
+  (let [new-user-db (user-to-db new_user)]
+    (jdbc/update! pg-uri :users new-user-db ["user_name = ?" (old :user)])))
 
 (defn save-ticket [ticket]
   (jdbc/insert! pg-uri :tickets ticket))
