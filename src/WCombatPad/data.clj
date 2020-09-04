@@ -177,7 +177,7 @@
   (jdbc/insert! pg-uri :tickets ticket))
 
 (defn get-tickets []
-  (jdbc/query pg-uri ["select * from tickets"]))
+  (map #(assoc % :user (:user_name %)) (jdbc/query pg-uri ["select * from tickets"])))
 
 (defn valid-ticket? [uuid]
   (not (nil? (first (jdbc/query pg-uri ["select * from tickets where uuid = ? and used is null" uuid])))))
@@ -185,13 +185,14 @@
 (defn use-ticket [uuid user]
   (let [ticket (first (jdbc/query pg-uri ["select * from tickets where uuid = ? and name = ?" uuid user]))]
            (print ticket)
-           (jdbc/update! pg-uri :tickets {:used "true"} ["uuid = ? and name = ?" uuid user])))
+           (jdbc/update! pg-uri :tickets {:used "true" :user_name user} ["uuid = ? and name = ?" uuid user])))
 
 (defn create-ticket-table []
-  (let [ddl (jdbc/create-table-ddl :tickets [[:name "varchar(100)" :primary :key]
-                                             [:uuid "varchar(100)"]
+  (let [ddl (jdbc/create-table-ddl :tickets [[:name "varchar(100)" ]
+                                             [:uuid "varchar(100)" :primary :key]
                                    [:url "varchar(200)"]
-                                   [:used "varchar(10)"]])]
+                                             [:used "varchar(10)"]
+                                             [:user_name "varchar(100)"]])]
      (jdbc/db-do-commands pg-uri [ddl])))
 
 (defn create-users-table []

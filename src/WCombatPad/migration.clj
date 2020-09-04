@@ -1,10 +1,10 @@
 (ns WCombatPad.migration
-  (:use [somnium.congomongo])
-  (:require [WCombatPad.data :as d])
+  (:require [somnium.congomongo :as m]
+            [WCombatPad.data :as d])
   )
 
 (defn set_default_sizes []
-  (do
+  (comment do
     (map
      (fn [data]
        (update! :combat-status data
@@ -17,3 +17,29 @@
   (d/create-users-table)
   (d/create-pads-table)
   (d/create-combat-status-table))
+
+(defn migrate-tickets [mongo-conn]
+  (m/with-mongo mongo-conn
+    (jdbc/insert-multi!
+     d/pg-uri
+     :tickets
+     (map (fn [ticket]
+            (-> ticket
+            (assoc :user_name (:user ticket) :used (if (:used ticket) "true" "false"))
+            (dissoc :user)(dissoc :_id)))
+          (m/fetch :tickets)))))
+
+(defn migrate-combat-status [mongo-conn]
+  (m/with-mongo mongo-conn
+    (jdbc/insert-multi!
+     d/pg-uri
+     :combat_status
+     (map (fn [status]
+            (->(dissoc status :_id )
+               d/combat-status-to-db))
+          (->>
+           (m/fetch :combat-status)
+           (map (fn [cs] [ (str (:name cs) "_" (:order cs)) cs]))
+           (into {})
+           (map val))))))
+
