@@ -1,6 +1,7 @@
 (ns WCombatPad.migration
   (:require [somnium.congomongo :as m]
-            [WCombatPad.data :as d])
+            [WCombatPad.data :as d]
+            [clojure.java.jdbc :as jdbc])
   )
 
 (defn set_default_sizes []
@@ -43,3 +44,19 @@
            (into {})
            (map val))))))
 
+(defn migrate-users [mongo-conn]
+  (m/with-mongo mongo-conn
+    (jdbc/insert-multi!
+     d/pg-uri
+     :users
+     (map (fn [user]
+            (-> (dissoc user :_id)
+                d/user-to-db))
+          (m/fetch :users)))))
+
+(defn migrate-pads [mongo-conn]
+  (m/with-mongo mongo-conn
+               (jdbc/insert-multi!
+                d/pg-uri
+                :pads
+                (m/fetch :pads))))
