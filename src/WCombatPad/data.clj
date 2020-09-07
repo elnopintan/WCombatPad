@@ -146,10 +146,12 @@
 (defn kill-character [user combat-name character-name dead]
   (next-state user combat-name (KillCharState. character-name dead)))
 
-(defn get-state-list [combat-name]  (comment sort-by :order (fetch :combat-status :only [:order :description] :where {:name combat-name} )))
+(defn get-state-list [combat-name]
+  (map combat-status-from-db (jdbc/query pg-uri ["select * from combat_status where name = ? order by ord_nu" combat-name])))
+
 
 (defn undo-action [combat-name]
-  (comment destroy! :combat-status (get-combat-data combat-name)))
+  (jdbc/delete! pg-uri :combat_status ["name = ? and ord_nu = (select max(ord_nu) from combat_status  where name = ?)" combat-name combat-name]))
 
 (defn user-to-db [user]
   (-> (assoc user :user_name (user :user) :admin (and (contains? user :admin) (:admin user)))
