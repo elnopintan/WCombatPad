@@ -158,8 +158,10 @@
       (dissoc :user)))
 
 (defn user-from-db [user]
-  (-> (assoc user :user (user :user_name))
-      (dissoc :user_name)))
+  (if (nil? user)
+    nil
+    (-> (assoc user :user (user :user_name))
+        (dissoc :user_name))))
 
 (defn new-user [user]
   (print user)
